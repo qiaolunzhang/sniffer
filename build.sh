@@ -1,2 +1,1 @@
-gcc -o sniffer sniffer.c -lpcap
-
+gcc -o mysniffer sniffer.c -lpcap

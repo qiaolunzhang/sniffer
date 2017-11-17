@@ -1,0 +1,1 @@
+main	/home/zhang/mycode/sniffer/mysniffer.c	/^int int main(int argc, char const *argv[]) {$/;"	function	line:8	signature:(int argc, char const *argv[])
