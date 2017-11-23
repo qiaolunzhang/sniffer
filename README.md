@@ -2,9 +2,12 @@
 
 ## requirements
 ```
-# for qtcreater
+# gtk3 for C
 sudo apt-get install libgtk-3-dev
+# to capture packet
 sudo apt-get install libpcap-dev
+# debug for qtcreator
+sudo apt-get install gdb
 ```
 *for libpcap work in qt*
 just add the following line to your .pro file 
