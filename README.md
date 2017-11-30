@@ -8,6 +8,8 @@ sudo apt-get install libgtk-3-dev
 sudo apt-get install libpcap-dev
 # debug for qtcreator
 sudo apt-get install gdb
+# for lGL
+sudo apt-get install libgl-dev
 ```
 *for libpcap work in qt*
 just add the following line to your .pro file 
