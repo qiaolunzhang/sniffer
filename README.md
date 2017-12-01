@@ -20,8 +20,7 @@ LIBS += -L/usr/local/lib/ -lpcap
 
 
 ## structure of the program
-- sniffer.c 
-a program find in the internet
-
-- find-device.c
-a program to print out the device that is using now
+- sniffer.cpp
+命令行下的sniffer程序
+- init.h
+定义的变量以及程序刚开始运行时的几个函数
