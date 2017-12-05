@@ -65,20 +65,31 @@ struct sniff_tcp {
 /* UDP header */
 struct sniff_udp
 {
-	u_short udp_sp;                       /*source port */
-  	u_short udp_dp;                       /* destination port*/
-	u_short udp_l;                        /* udp length */
-  	u_short udp_cs;                       /* check sum*/
+	u_short udp_sp;              	/*source port */
+  	u_short udp_dp;                	/* destination port*/
+	u_short udp_l;                	/* udp length */
+  	u_short udp_cs;                	/* check sum*/
 };
 
 /* ICMP header */
 struct sniff_icmp
 {
-	u_char	icmp_t;                       /*type*/
-	u_char	icmp_c;                       /*code*/
-	u_short	icmp_cs;                      /*check sum*/
+	u_char	icmp_t;               	/*type*/
+	u_char	icmp_c;			/*code*/
+	u_short	icmp_cs;		/*check sum*/
 };
 
+/* ARP header */
+struct sniff_arp
+{
+	u_short arp_ht,arp_pt;		/*hardware type & protocol type*/
+	u_char	arp_htlen,ptlen;	/*hardware length & protocol length*/
+	u_short arp_opcode;		/*type*/
+	u_char	arp_sp[6];		/*source physics*/
+	in_addr arp_sip;		/*source ip */
+	u_char	arp_tp[6];		/*target physics*/
+	in_addr arp_tip;		/*target ip*/
+};
 void
 got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
 
