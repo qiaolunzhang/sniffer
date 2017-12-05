@@ -1,3 +1,5 @@
+#ifndef INIT_H
+#define INIT_H
 #include <netinet/in.h> /* for in_addr */
 #include <arpa/inet.h> /* for inet_ntoa */
 #include <iostream>
@@ -11,21 +13,23 @@
 #include <netinet/if_ether.h>
 
 using namespace std;
+//std::string str;
 
-char *device; /* Name of device (e.g. eth0, wlan0) */
-char ip[13];
-char subnet_mask[13];
-bpf_u_int32 ip_raw; /* IP address as integer */
-bpf_u_int32 subnet_mask_raw;  /* Subnet mask as integer */
-int lookup_return_code;
-char error_buffer[PCAP_ERRBUF_SIZE]; /* Size defined in pcap.h */
-struct in_addr address; /* used for both ip & subnet */
 
-pcap_t *handle;
-const u_char *packet;
-struct pcap_pkthdr packet_header;
-int packet_count_limit = 1;
-int timeout_limit = 10000;  /* In milliseconds */
+extern char *device; /* Name of device (e.g. eth0, wlan0) */
+extern char ip[13];
+extern char subnet_mask[13];
+extern bpf_u_int32 ip_raw; /* IP address as integer */
+extern bpf_u_int32 subnet_mask_raw;  /* Subnet mask as integer */
+extern int lookup_return_code;
+extern char error_buffer[PCAP_ERRBUF_SIZE]; /* Size defined in pcap.h */
+extern struct in_addr address; /* used for both ip & subnet */
+
+extern pcap_t *handle;
+extern const u_char *packet;
+extern struct pcap_pkthdr packet_header;
+//extern int packet_count_limit = 1;
+//int timeout_limit = 10000;  /* In milliseconds */
 
 void print_packet_info(const u_char *packet, struct pcap_pkthdr packet_header);
 
@@ -42,60 +46,4 @@ void determin_packet_type_handler(
     const struct pcap_pkthdr *packet_header,
     const u_char *packet
 );
-
-/* Find all the device */
-void print_packet_info(const u_char *packet, struct pcap_pkthdr packet_header) {
-    printf("Packet capture length: %d\n", packet_header.caplen);
-    printf("Packet total length %d\n", packet_header.len);
-}
-
-
-void print_all_devices()
-{
-  struct if_nameindex *if_ni, *i;
-  if_ni = if_nameindex();
-  if (if_ni == NULL) {
-      perror("if_nameindex");
-      exit(EXIT_FAILURE);
-  }
-
-  cout << "This computer has the following devices: " << endl;
-  for (i = if_ni; !(i->if_index == 0 && i->if_name == NULL); i++)
-      printf("%u: %s\n", i->if_index, i->if_name);
-  if_freenameindex(if_ni);
-}
-
-void determin_packet_type_handler(
-    u_char *args,
-    const struct pcap_pkthdr *packet_header,
-    const u_char *packet
-)
-{
-    print_packet_info(packet, *packet_header);
-    return;
-}
-
-void my_packet_handler(
-    u_char *args,
-    const struct pcap_pkthdr* header,
-    const u_char* packet
-) {
-    print_packet_info(packet, *header);
-    struct ether_header *eth_header;
-    /* The packet is larger than the ether_header struct,
-       but we just want to look at the first part of the packet
-       that contains the header. We force the compiler
-       to treat the pointer to the packet as just a pointer
-       to the ether_header. The data payload of the packet comes
-       after the headers. Different packet types have different header
-       lengths though, but the ethernet header is always the same (14 bytes) */
-    eth_header = (struct ether_header *) packet;
-
-    if (ntohs(eth_header->ether_type) == ETHERTYPE_IP) {
-        printf("IP\n");
-    } else  if (ntohs(eth_header->ether_type) == ETHERTYPE_ARP) {
-        printf("ARP\n");
-    } else  if (ntohs(eth_header->ether_type) == ETHERTYPE_REVARP) {
-        printf("Reverse ARP\n");
-    }
-}
+#endif

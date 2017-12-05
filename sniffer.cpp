@@ -1,8 +1,10 @@
 #include "init.h"
+#include "protocol.h"
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
+    cout << ETHER_ADDR_LEN << endl;
     // print_all_devices();
     int snapshot_len = 1028;
     int promiscuous = 0;
@@ -30,7 +32,7 @@ int main(int argc, char *argv[]) {
      }
 
      //pcap_loop(handle, 0, my_packet_handler, NULL);
-     pcap_loop(handle, 0, my_packet_handler, NULL);
+     pcap_loop(handle, 0, got_packet, NULL);
 
     pcap_close(handle);
     return 0;
