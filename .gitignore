@@ -1,5 +1,5 @@
 test
-build.sh
+./build.sh
 build_cpp.sh
 init.h.gch
 a.out
