@@ -62,6 +62,23 @@ struct sniff_tcp {
         u_short th_urp;                 /* urgent pointer */
 };
 
+/* UDP header */
+struct sniff_udp
+{
+	u_short udp_sp;                       /*source port */
+  u_short udp_dp;                       /* destination port*/
+	u_short udp_l;                        /* udp length */
+  u_short udp_cs;                       /* check sum*/
+};
+
+/* ICMP header */
+struct sniff_icmp
+{
+	u_char	icmp_t;                       /*type*/
+	u_char	icmp_c;                       /*code*/
+	u_short	icmp_cs;                      /*check sum*/
+};
+
 void
 got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
 
