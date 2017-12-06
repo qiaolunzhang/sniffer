@@ -66,9 +66,9 @@ struct sniff_tcp {
 struct sniff_udp
 {
 	u_short udp_sp;              	/*source port */
-  	u_short udp_dp;                	/* destination port*/
+  u_short udp_dp;                	/* destination port*/
 	u_short udp_l;                	/* udp length */
-  	u_short udp_cs;                	/* check sum*/
+  u_short udp_cs;                	/* check sum*/
 };
 
 /* ICMP header */

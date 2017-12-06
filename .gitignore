@@ -5,3 +5,4 @@ init.h.gch
 a.out
 .tags*
 doc*
+build.sh

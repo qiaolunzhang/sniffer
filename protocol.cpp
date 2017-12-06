@@ -111,6 +111,7 @@ got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
  const struct sniff_ethernet *ethernet;  /* The ethernet header [1] */
  const struct sniff_ip *ip;              /* The IP header */
  const struct sniff_tcp *tcp;            /* The TCP header */
+ const struct sniff_udp *udp;
  const char *payload;                    /* Packet payload */
 
  int size_ip;
@@ -139,9 +140,19 @@ got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
  switch(ip->ip_p) {
   case IPPROTO_TCP:
    printf("   Protocol: TCP\n");
-   break;
+   return;
+   //break;
   case IPPROTO_UDP:
    printf("   Protocol: UDP\n");
+   udp = (struct sniff_udp*)(packet + SIZE_ETHERNET + size_ip);
+   printf("   Src port: %d\n", ntohs(udp->udp_sp));
+   printf("   Dst port: %d\n", ntohs(udp->udp_dp));
+   payload = reinterpret_cast<const char *>((u_char *)(packet + 16 * 4));
+   size_payload = ntohs(ip->ip_len) - (size_ip + 16 * 4);
+   if (size_payload > 0) {
+    printf("   Payload (%d bytes):\n", size_payload);
+    print_payload(reinterpret_cast<const u_char*>(payload), size_payload);
+   }
    return;
   case IPPROTO_ICMP:
    printf("   Protocol: ICMP\n");
