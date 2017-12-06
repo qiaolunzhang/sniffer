@@ -6,4 +6,4 @@ a.out
 .tags*
 doc*
 build.sh
-protocol.h.cgh
+protocol.h.gch
