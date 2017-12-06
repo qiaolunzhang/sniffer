@@ -4,3 +4,4 @@ build_cpp.sh
 init.h.gch
 a.out
 .tags*
+doc*
