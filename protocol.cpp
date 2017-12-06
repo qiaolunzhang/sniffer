@@ -112,6 +112,8 @@ got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
  const struct sniff_ip *ip;              /* The IP header */
  const struct sniff_tcp *tcp;            /* The TCP header */
  const struct sniff_udp *udp;
+ const struct sniff_icmp *icmp;
+ const struct sniff_arp *arp;
  const char *payload;                    /* Packet payload */
 
  int size_ip;
@@ -139,30 +141,36 @@ got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
  /* determine protocol */
  switch(ip->ip_p) {
   case IPPROTO_TCP:
-   printf("   Protocol: TCP\n");
-   return;
-   //break;
+    printf("   Protocol: TCP\n");
+    break;
   case IPPROTO_UDP:
-   printf("   Protocol: UDP\n");
-   udp = (struct sniff_udp*)(packet + SIZE_ETHERNET + size_ip);
-   printf("   Src port: %d\n", ntohs(udp->udp_sp));
-   printf("   Dst port: %d\n", ntohs(udp->udp_dp));
-   payload = reinterpret_cast<const char *>((u_char *)(packet + 16 * 4));
-   size_payload = ntohs(ip->ip_len) - (size_ip + 16 * 4);
-   if (size_payload > 0) {
-    printf("   Payload (%d bytes):\n", size_payload);
-    print_payload(reinterpret_cast<const u_char*>(payload), size_payload);
+    printf("   Protocol: UDP\n");
+    udp = (struct sniff_udp*)(packet + SIZE_ETHERNET + size_ip);
+    printf("   Src port: %d\n", ntohs(udp->udp_sp));
+    printf("   Dst port: %d\n", ntohs(udp->udp_dp));
+    payload = reinterpret_cast<const char *>((u_char *)(packet + 16 * 4));
+    size_payload = ntohs(ip->ip_len) - (size_ip + 16 * 4);
+    if (size_payload > 0) {
+      printf("   Payload (%d bytes):\n", size_payload);
+      print_payload(reinterpret_cast<const u_char*>(payload), size_payload);
    }
-   return;
+    return;
   case IPPROTO_ICMP:
-   printf("   Protocol: ICMP\n");
-   return;
+    printf("   Protocol: ICMP\n");
+    icmp = (struct sniff_icmp*)(packet + SIZE_ETHERNET + size_ip);
+    payload = reinterpret_cast<const char *>((u_char *)(packet + 63));
+    size_payload = ntohs(ip->ip_len) - (size_ip + 64);
+    if (size_payload > 0) {
+      printf("   Payload (%d bytes):\n", size_payload);
+      print_payload(reinterpret_cast<const u_char*>(payload), size_payload);
+    }
+    return;
   case IPPROTO_IP:
-   printf("   Protocol: IP\n");
-   return;
+    printf("   Protocol: IP\n");
+    return;
   default:
-   printf("   Protocol: unknown\n");
-   return;
+    printf("   Protocol: unknown\n");
+    return;
  }
 
  /*
