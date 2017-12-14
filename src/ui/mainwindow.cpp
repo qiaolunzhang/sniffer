@@ -12,6 +12,20 @@ MainWindow::MainWindow(QWidget *parent) :
     mainTreeView = new ListTreeView();
     ui->treeView->setModel(mainTreeView->mainModel);
 
+    model_dev = new QStringListModel(this);
+
+    msniffer = new sniffer();
+
+    msniffer->set_all_device();
+
+    QStringList List;
+    for (int i=0; i<msniffer->device_count; i++) {
+        List << msniffer->device_all[i];
+    }
+
+    model_dev->setStringList(List);
+    ui->comboBox->setModel(model_dev);
+    //mainTreeView->addOneCaptureItem("1", "2", "3", "4", "5", "6");
 }
 
 

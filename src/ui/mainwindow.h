@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include <QTreeWidget>
 #include <QStandardItemModel>
+#include <QtWidgets>
 #include "listtreeview.h"
+#include "sniffer.h"
 
 class ListTreeView;
 
@@ -27,7 +29,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    sniffer *msniffer;
     ListTreeView *mainTreeView;
+    QStringListModel *model_dev;
 };
 
 #endif // MAINWINDOW_H

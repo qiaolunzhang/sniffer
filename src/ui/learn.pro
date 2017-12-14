@@ -13,9 +13,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    listtreeview.cpp
+    listtreeview.cpp \
+    sniffer.cpp
 
 HEADERS  += mainwindow.h \
-    listtreeview.h
+    listtreeview.h \
+    sniffer.h \
+    sniffer.h
 
 FORMS    += mainwindow.ui
