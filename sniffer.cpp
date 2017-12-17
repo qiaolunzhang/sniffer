@@ -1,5 +1,6 @@
 #include "init.h"
 #include "protocol.h"
+#include <pcap.h>
 
 using namespace std;
 

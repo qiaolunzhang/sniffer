@@ -15,6 +15,8 @@ struct sniff_ethernet {
   u_char ether_dhost[ETHER_ADDR_LEN];
   u_char ether_shost[ETHER_ADDR_LEN];
   u_short ether_type; /* IP? ARP? RARP? etc */
+  #define IP 0x0800
+  #define ARP 0x0806
 };
 
 /* IP header */
@@ -46,7 +48,7 @@ struct sniff_tcp {
         tcp_seq th_seq;                 /* sequence number */
         tcp_seq th_ack;                 /* acknowledgement number */
         u_char  th_offx2;               /* data offset, rsvd */
-#define TH_OFF(th)      (((th)->th_offx2 & 0xf0) >> 4)
+		#define TH_OFF(th)      (((th)->th_offx2 & 0xf0) >> 4)
         u_char  th_flags;
         #define TH_FIN  0x01
         #define TH_SYN  0x02

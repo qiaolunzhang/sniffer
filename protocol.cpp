@@ -126,6 +126,8 @@ got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
  /* define ethernet header */
  ethernet = (struct sniff_ethernet*)(packet);
 
+if(ntohs(ethernet->ether_type)==IP){
+
  /* define/compute ip header offset */
  ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
  size_ip = IP_HL(ip)*4;
@@ -142,7 +144,16 @@ got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
  switch(ip->ip_p) {
   case IPPROTO_TCP:
     printf("   Protocol: TCP\n");
-    break;
+	tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
+    printf("   Src port: %d\n", ntohs(tcp->th_sport));
+    printf("   Dst port: %d\n", ntohs(tcp->th_dport));
+	payload = reinterpret_cast<const char *>((u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp));
+	size_payload = ntohs(ip->ip_len) - (size_ip + size_tcp);
+	if (size_payload > 0) {
+      printf("   Payload (%d bytes):\n", size_payload);
+      print_payload(reinterpret_cast<const u_char*>(payload), size_payload);
+   }
+    return;
   case IPPROTO_UDP:
     printf("   Protocol: UDP\n");
     udp = (struct sniff_udp*)(packet + SIZE_ETHERNET + size_ip);
@@ -172,37 +183,7 @@ got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
     printf("   Protocol: unknown\n");
     return;
  }
-
- /*
-  *  OK, this packet is TCP.
-  */
-
- /* define/compute tcp header offset */
- tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
- size_tcp = TH_OFF(tcp)*4;
- if (size_tcp < 20) {
-  printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
-  return;
- }
-
- printf("   Src port: %d\n", ntohs(tcp->th_sport));
- printf("   Dst port: %d\n", ntohs(tcp->th_dport));
-
- /* define/compute tcp payload (segment) offset */
-// payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp);
- payload = reinterpret_cast<const char *>((u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp));
-
- /* compute tcp payload (segment) size */
- size_payload = ntohs(ip->ip_len) - (size_ip + size_tcp);
-
- /*
-  * Print payload data; it might be binary, so don't just
-  * treat it as a string.
-  */
- if (size_payload > 0) {
-  printf("   Payload (%d bytes):\n", size_payload);
-  print_payload(reinterpret_cast<const u_char *>(payload), size_payload);
- }
-
+}
+else printf("arp");
 return;
 }
