@@ -15,12 +15,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     listtreeview.cpp \
     getdevice.cpp \
-    sniffer.cpp
+    sniffer.cpp \
+    protocol.cpp
 
 HEADERS  += mainwindow.h \
     listtreeview.h \
     getdevice.h \
-    sniffer.h
+    sniffer.h \
+    protocol.h
 
 FORMS    += mainwindow.ui
 

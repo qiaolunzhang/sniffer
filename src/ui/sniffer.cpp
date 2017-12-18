@@ -13,4 +13,15 @@ void sniffer::run()
         return;
     }
     cout << device << endl;
+    handle = pcap_open_live(
+                device,
+                snapshot_len,
+                promiscuous,
+                timeout,
+                error_buffer);
+    if (handle == NULL) {
+        fprintf(stderr,"Could not open device %s: %s\n", device, error_buffer);
+    }
+
+    pcap_loop(handle, 0, got_packet, NULL);
 }

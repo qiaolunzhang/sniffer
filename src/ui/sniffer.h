@@ -14,6 +14,8 @@
 #include <time.h>
 #include <netinet/if_ether.h>
 
+#include "protocol.h"
+
 using namespace std;
 
 class sniffer: public QThread
@@ -24,6 +26,7 @@ private:
     int promiscuous = 0;
     int timeout = 1000;
     char error_buffer[PCAP_ERRBUF_SIZE];
+    pcap_t *handle;
 private:
     void run();
 public:
