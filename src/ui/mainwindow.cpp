@@ -14,18 +14,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
     model_dev = new QStringListModel(this);
 
-    msniffer = new sniffer();
+    mdevice = new getdevice();
 
-    msniffer->set_all_device();
+    mdevice->set_all_device();
 
     QStringList List;
-    for (int i=0; i<msniffer->device_count; i++) {
-        List << msniffer->device_all[i];
+    for (int i=0; i<mdevice->device_count; i++) {
+        List << mdevice->device_all[i];
     }
 
     model_dev->setStringList(List);
     ui->comboBox->setModel(model_dev);
     //mainTreeView->addOneCaptureItem("1", "2", "3", "4", "5", "6");
+    msniffer = new sniffer();
+    msniffer->start();
 }
 
 

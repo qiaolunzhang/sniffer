@@ -6,6 +6,7 @@
 #include <QStandardItemModel>
 #include <QtWidgets>
 #include "listtreeview.h"
+#include "getdevice.h"
 #include "sniffer.h"
 
 class ListTreeView;
@@ -29,6 +30,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    getdevice *mdevice;
     sniffer *msniffer;
     ListTreeView *mainTreeView;
     QStringListModel *model_dev;

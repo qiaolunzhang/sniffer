@@ -1,6 +1,7 @@
 #ifndef SNIFFER_H
 #define SNIFFER_H
 
+#include <QtCore>
 #include <netinet/in.h> /* for in_addr */
 #include <arpa/inet.h> /* for inet_ntoa */
 #include <iostream>
@@ -15,31 +16,18 @@
 
 using namespace std;
 
-class sniffer
+class sniffer: public QThread
 {
+private:
+    char *device;
+    int snapshot_len = 1028;
+    int promiscuous = 0;
+    int timeout = 1000;
+    char error_buffer[PCAP_ERRBUF_SIZE];
+private:
+    void run();
 public:
     sniffer();
-    ~sniffer();
-    void set_all_device();
-
-
-
-public:
-
-    char **device_all;
-    int device_count;
-    char *device; /* Name of device (e.g. eth0, wlan0) */
-    char ip[13];
-    char subnet_mask[13];
-    bpf_u_int32 ip_raw; /* IP address as integer */
-    bpf_u_int32 subnet_mask_raw;  /* Subnet mask as integer */
-    int lookup_return_code;
-    char error_buffer[PCAP_ERRBUF_SIZE]; /* Size defined in pcap.h */
-    struct in_addr address; /* used for both ip & subnet */
-
-    pcap_t *handle;
-    const u_char *packet;
-    struct pcap_pkthdr packet_header;
 };
 
 #endif // SNIFFER_H

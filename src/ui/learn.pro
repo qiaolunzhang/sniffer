@@ -14,11 +14,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     listtreeview.cpp \
+    getdevice.cpp \
     sniffer.cpp
 
 HEADERS  += mainwindow.h \
     listtreeview.h \
-    sniffer.h \
+    getdevice.h \
     sniffer.h
 
 FORMS    += mainwindow.ui
+
+LIBS += -L/usr/local/lib/ -lpcap
+
