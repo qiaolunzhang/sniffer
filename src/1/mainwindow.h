@@ -7,12 +7,10 @@
 #include <QtWidgets>
 #include <QString>
 #include <string>
-#include "listtreeview.h"
 #include "sniffer.h"
 #include "snifferthread.h"
 #include "protocol.h"
 
-class ListTreeView;
 
 namespace Ui {
 class MainWindow;
@@ -30,13 +28,13 @@ private slots:
     void on_btn_stop_clicked();
 
 private:
-    Ui::MainWindow      *ui;
-    sniffer             *msniffer;
-    ListTreeView        *mainTreeView;
-    QStringListModel    *model_dev;
-    SnifferThread       *snifferthread;
-    char                *device;
-    void DoSelect(QString);
+    Ui::MainWindow          *ui;
+    sniffer                 *msniffer;
+    QStringListModel        *model_dev;
+    SnifferThread           *snifferthread;
+    char                    *device;
+    QStandardItemModel      *packetModel;
+    QSortFilterProxyModel   *packetModelProxy;
 };
 
 #endif // MAINWINDOW_H

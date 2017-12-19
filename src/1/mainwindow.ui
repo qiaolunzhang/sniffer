@@ -24,16 +24,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QTreeView" name="treeView">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>41</y>
-      <width>651</width>
-      <height>191</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QTreeView" name="treeView_2">
     <property name="geometry">
      <rect>
@@ -68,6 +58,16 @@
     </property>
     <property name="text">
      <string>stop</string>
+    </property>
+   </widget>
+   <widget class="QTableView" name="packetTableView">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>651</width>
+      <height>192</height>
+     </rect>
     </property>
    </widget>
   </widget>

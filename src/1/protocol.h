@@ -12,7 +12,9 @@
 #include <time.h>
 #include <netinet/if_ether.h>
 #include <QString>
-#include "listtreeview.h"
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <QList>
 /* default snap length(maximum bytes per packet to capture) */
 #define SNAP_LEN 1518
 /* ethernet headers are always 14 bytes [1] */
@@ -108,7 +110,7 @@ struct sniff_arp
 void
 got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
 
-void packet_info(const struct pcap_pkthdr *header, const u_char *packet,ListTreeView *packetmodel);
+void packet_info(const struct pcap_pkthdr *header,const u_char *packet,QList<QStandardItem *>*row);
 
 void
 print_payload(const u_char *payload, int len);

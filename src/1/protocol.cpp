@@ -101,16 +101,15 @@ return;
 /*
  * dissect/print packet
  */
-void packet_info(const struct pcap_pkthdr *header, const u_char *packet,ListTreeView *packetmodel)
+void packet_info(const struct pcap_pkthdr *header, const u_char *packet, QList<QStandardItem *> *row)
 {
  static int count = 1;                   /* packet counter */
 
  /* declare pointers to packet headers */
  const struct sniff_ethernet *ethernet;  /* The ethernet header [1] */
  int size_ip;
- QString qnum,qtime,qsip,qdip,qprotocol,qlen;
- qnum = QString::number(count++);
- qtime = (QString)ctime((const time_t *)&header->ts.tv_sec);
+ row->append(new QStandardItem(QString::number(count++)));
+ row->append(new QStandardItem(QString(ctime((const time_t *)&header->ts.tv_sec))));
 
  /* define ethernet header */
  ethernet = (struct sniff_ethernet*)(packet);
@@ -129,44 +128,45 @@ if(ntohs(ethernet->ether_type)==IP){
  printf("       From: %s\n", inet_ntoa(ip->ip_src));
  printf("         To: %s\n", inet_ntoa(ip->ip_dst));
 
- qsip = (QString)inet_ntoa(ip->ip_src);
- qdip = (QString)inet_ntoa(ip->ip_dst);
- qlen = (QString)ip->ip_len;
+row->append(new QStandardItem(QString(inet_ntoa(ip->ip_src))));
+row->append(new QStandardItem(QString(inet_ntoa(ip->ip_dst))));
+row->append(new QStandardItem(QString::number(ip->ip_len)));
 
  /* determine protocol */
  switch(ip->ip_p) {
   case IPPROTO_TCP:
     printf("   Protocol: TCP\n");
-    qprotocol = "TCP";
-    return;
+    row->append(new QStandardItem("TCP"));
+    break;
   case IPPROTO_UDP:
     printf("   Protocol: UDP\n");
-    qprotocol = "UDP";
-    return;
+    row->append(new QStandardItem("UDP"));
+    break;
   case IPPROTO_ICMP:
     printf("   Protocol: ICMP\n");
-    qprotocol = "ICMP";
-    return;
+    row->append(new QStandardItem("ICMP"));
+    break;
   case IPPROTO_IP:
     printf("   Protocol: IP\n");
-    qprotocol = "IP";
-    return;
+    row->append(new QStandardItem("IP"));
+    break;
   default:
     printf("   Protocol: unknown\n");
-    qprotocol = "UNKNOWN";
-    return;
+    row->append(new QStandardItem("UNKNOWN"));
+    break;
  }
 }
 else{
     const struct sniff_arp *arp;
+    arp = (struct sniff_arp*)(packet + SIZE_ETHERNET);
     printf("arp");
-    qprotocol = "ARP";
-    qsip = (QString)inet_ntoa(arp->arp_sip);
-    qdip = "Broadcast";
-    qlen = (QString)arp->ptlen;
+
+    row->append(new QStandardItem(QString(inet_ntoa(arp->arp_sip))));
+    row->append(new QStandardItem("Broadcast"));
+    row->append(new QStandardItem(QString::number(arp->ptlen)));
+    row->append(new QStandardItem("ARP"));
 }
-packetmodel->addOneCaptureItem(qnum,qtime,qsip,qdip,qprotocol,qlen);
-return;
+
 }
 
 void

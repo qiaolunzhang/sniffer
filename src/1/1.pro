@@ -29,13 +29,11 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     sniffer.cpp \
-    listtreeview.cpp \
     snifferthread.cpp \
     protocol.cpp
 
 HEADERS += \
         mainwindow.h \
-    listtreeview.h \
     sniffer.h \
     snifferthread.h \
     protocol.h

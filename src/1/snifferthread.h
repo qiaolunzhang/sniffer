@@ -4,23 +4,25 @@
 #include <QThread>
 #include <QStandardItem>
 #include <pcap.h>
-#include "listtreeview.h"
 #include "protocol.h"
+#include <vector>
+#include <QList>
 #include <netinet/in.h> /* for in_addr */
 #include <arpa/inet.h> /* for inet_ntoa */
 
 
 class SnifferThread : public QThread{
 public:
-    SnifferThread(ListTreeView *packetmodel,char *device);
+    SnifferThread(QStandardItemModel *packetmodel,char *device);
     ~SnifferThread();
     void            stopcapture();
 private:
-    char            *device;
-    bool            stop;
-    void            run();
-    int             packetnum;
-    ListTreeView   *packetmodel;
+    char                *device;
+    bool                stop;
+    void                run();
+    int                 packetnum;
+    QStandardItemModel  *packetmodel;
+    std::vector<char *> data;
 
 };
 
