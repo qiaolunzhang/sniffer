@@ -26,8 +26,13 @@ MainWindow::MainWindow(QWidget *parent) :
     model_dev->setStringList(List);
     ui->comboBox->setModel(model_dev);
     //mainTreeView->addOneCaptureItem("1", "2", "3", "4", "5", "6");
+<<<<<<< HEAD
     //msniffer = new sniffer();
     //msniffer->start();
+=======
+    msniffer = new sniffer(mainTreeView);
+    msniffer->start();
+>>>>>>> 8cec4304630d6592d84218181630a7d25a4f9dbf
 }
 
 
