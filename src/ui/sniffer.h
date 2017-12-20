@@ -14,16 +14,13 @@
 #include <time.h>
 #include <netinet/if_ether.h>
 
-<<<<<<< HEAD
 #include <list>
 
 #include "protocol.h"
-=======
 //#include <QtWidgets>
 #include "listtreeview.h"
 
 //#include "protocol.h"
->>>>>>> 8cec4304630d6592d84218181630a7d25a4f9dbf
 
 using namespace std;
 
@@ -58,20 +55,13 @@ private:
     int timeout = 1000;
     char error_buffer[PCAP_ERRBUF_SIZE];
     pcap_t *handle;
-<<<<<<< HEAD
     struct bpf_program fp;
     bpf_u_int32 mask;
     bpf_u_int32 net;
     const u_char *packet;
     struct pcap_pkthdr header;
 
-
-=======
-
-    volatile bool stopped;
-
     ListTreeView *mainTreeView;
->>>>>>> 8cec4304630d6592d84218181630a7d25a4f9dbf
 private:
     void run();
 public:
@@ -80,11 +70,8 @@ public:
     list<struct s_packet>packet_list;
 public:
     sniffer();
-<<<<<<< HEAD
     sniffer(char *device_selected, char *filter_exp_entered);
-=======
     sniffer(ListTreeView *mymainTreeView);
->>>>>>> 8cec4304630d6592d84218181630a7d25a4f9dbf
 };
 
 #endif // SNIFFER_H
