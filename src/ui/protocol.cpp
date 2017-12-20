@@ -102,7 +102,8 @@ return;
  * dissect/print packet
  */
 void
-got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
+//got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
+got_packet(const u_char *packet)
 {
 
  static int count = 1;                   /* packet counter */

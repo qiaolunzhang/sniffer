@@ -8,6 +8,9 @@
 #include "listtreeview.h"
 #include "getdevice.h"
 #include "sniffer.h"
+#include <iostream>
+
+#include "protocol.h"
 
 class ListTreeView;
 
@@ -28,12 +31,15 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+
 private:
     Ui::MainWindow *ui;
     getdevice *mdevice;
     sniffer *msniffer;
     ListTreeView *mainTreeView;
     QStringListModel *model_dev;
+private:
+    char *get_filter_exp();
 };
 
 #endif // MAINWINDOW_H

@@ -105,7 +105,8 @@ struct sniff_arp
     in_addr arp_tip;		/*target ip*/
 };
 void
-got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
+//got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
+got_packet(const u_char *packet);
 
 void
 print_payload(const u_char *payload, int len);
