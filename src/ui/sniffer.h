@@ -14,7 +14,10 @@
 #include <time.h>
 #include <netinet/if_ether.h>
 
-#include "protocol.h"
+//#include <QtWidgets>
+#include "listtreeview.h"
+
+//#include "protocol.h"
 
 using namespace std;
 
@@ -27,10 +30,15 @@ private:
     int timeout = 1000;
     char error_buffer[PCAP_ERRBUF_SIZE];
     pcap_t *handle;
+
+    volatile bool stopped;
+
+    ListTreeView *mainTreeView;
 private:
     void run();
 public:
     sniffer();
+    sniffer(ListTreeView *mymainTreeView);
 };
 
 #endif // SNIFFER_H
