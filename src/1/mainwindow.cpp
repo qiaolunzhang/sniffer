@@ -99,3 +99,8 @@ void MainWindow::on_packetTableView_doubleClicked(const QModelIndex &index)
     snifferthread->FillDetails(packetdetails,dataindex-1,size);
 
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+   snifferthread->IpDefragment();
+}

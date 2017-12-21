@@ -5,6 +5,7 @@
 #include <QStandardItem>
 #include <pcap.h>
 #include "protocol.h"
+#include "ip_defrag.h"
 #include <vector>
 #include <QList>
 #include <QPlainTextEdit>
@@ -19,6 +20,7 @@ public:
     void                stopcapture();
     void                FillData(QPlainTextEdit *text,int index,int size);
     void                FillDetails(QStandardItemModel *packetdetails,int index,int size);
+    void				IpDefragment();
 private:
     char                *device;
     char				*filter_exp;
@@ -32,6 +34,8 @@ private:
     QStandardItemModel  *packetdetails;
     std::vector<unsigned char *> Data;
 
+
+    void				ip_frag_reasm();
 };
 
 #endif // SNIFFERTHREAD_H

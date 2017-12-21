@@ -34,19 +34,19 @@ void handle_ipv4(const u_char *packet,QList<QStandardItem *> *row){
     /* determine protocol */
     switch(ip->ip_p) {
     case IPPROTO_TCP:
-       printf("   Protocol: TCP\n");
+       //printf("   Protocol: TCP\n");
        handle_tcp((packet+size_ip),row);
        break;
      case IPPROTO_UDP:
-       printf("   Protocol: UDP\n");
+       //printf("   Protocol: UDP\n");
        handle_udp((packet+size_ip),row);
        break;
      case IPPROTO_ICMP:
-       printf("   Protocol: ICMP\n");
+       //printf("   Protocol: ICMP\n");
        handle_icmp((packet+size_ip),row);
        break;
      default:
-       printf("   Protocol: unknown\n");
+       //printf("   Protocol: unknown\n");
        row->append(new QStandardItem("UNKNOWN"));
        break;
     }
@@ -65,19 +65,19 @@ void handle_ipv6(const u_char *packet,QList<QStandardItem *> *row){
     /* determine protocol */
     switch(ip->ip6_p) {
     case IPPROTO_TCP:
-       printf("   Protocol: TCP\n");
+       //printf("   Protocol: TCP\n");
        handle_tcp((packet+IPV6_HEADER_LENGTH),row);
        break;
      case IPPROTO_UDP:
-       printf("   Protocol: UDP\n");
+       //printf("   Protocol: UDP\n");
        handle_udp((packet+IPV6_HEADER_LENGTH),row);
        break;
      case IPPROTO_ICMP:
-       printf("   Protocol: ICMP\n");
+       //printf("   Protocol: ICMP\n");
        handle_icmp((packet+IPV6_HEADER_LENGTH),row);
        break;
      default:
-       printf("   Protocol: unknown\n");
+       //printf("   Protocol: unknown\n");
        row->append(new QStandardItem("UNKNOWN"));
        break;
     }

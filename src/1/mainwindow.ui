@@ -17,9 +17,9 @@
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>22</x>
-      <y>12</y>
-      <width>771</width>
+      <x>23</x>
+      <y>10</y>
+      <width>542</width>
       <height>460</height>
      </rect>
     </property>
@@ -54,6 +54,13 @@
         <widget class="QPushButton" name="btn_stop_2">
          <property name="text">
           <string>clear</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>defrag</string>
          </property>
         </widget>
        </item>

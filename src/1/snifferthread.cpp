@@ -103,3 +103,22 @@ void    SnifferThread::FillDetails(QStandardItemModel *packetdetails,int index,i
     packetdetails->clear();
     packet_details(Data.at(index),packetdetails);
 }
+
+void	SnifferThread::IpDefragment() {
+    std::vector <unsigned char *> :: iterator i;
+    for (i = this->Data.begin(); i != this->Data.end(); i++) {
+        if (ip_is_fragment(*i)) {
+            //this->ip_defrag(i);
+        }
+    }
+    // this->ip_frag_reasm();
+}
+
+
+
+void	SnifferThread::ip_frag_reasm() {
+    // for each queue
+    // sort with offset
+    // new data
+    // add the pointer to the vector
+}

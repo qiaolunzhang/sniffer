@@ -30,13 +30,15 @@ SOURCES += \
         mainwindow.cpp \
     sniffer.cpp \
     snifferthread.cpp \
-    protocol.cpp
+    protocol.cpp \
+    ip_defrag.cpp
 
 HEADERS += \
         mainwindow.h \
     sniffer.h \
     snifferthread.h \
-    protocol.h
+    protocol.h \
+    ip_defrag.h
 
 FORMS += \
         mainwindow.ui
