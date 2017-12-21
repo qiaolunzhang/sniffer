@@ -64,11 +64,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btn_run_clicked()
 {
+    std::string filter_exp_string = ui->lineEdit->text().toStdString();
+
+    std::cout << "filter_exp_string" << filter_exp_string << std::endl;
+
+    char *filter_exp;
+    filter_exp = new char[filter_exp_string.size() + 1];
+    std::copy(filter_exp_string.begin(), filter_exp_string.end(), filter_exp);
+    filter_exp[filter_exp_string.size()] = '\0';
+
     printf("start\n");
     QByteArray q = ui->comboBox->currentText().toLatin1();
     device = q.data();
     if(snifferthread==NULL){
-        snifferthread = new SnifferThread(packetModel,device);
+        snifferthread = new SnifferThread(packetModel,device, filter_exp);
     }
     printf("thread ok\n");
     snifferthread->start();

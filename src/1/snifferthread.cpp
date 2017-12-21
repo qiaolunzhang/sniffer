@@ -1,9 +1,11 @@
 #include "snifferthread.h"
 
 
-SnifferThread::SnifferThread(QStandardItemModel *packetmodel,char *device){
+SnifferThread::SnifferThread(QStandardItemModel *packetmodel,char *device, char *filter_exp_entered = NULL){
     this->packetmodel = packetmodel;
     this->device = device;
+    this->filter_exp = filter_exp_entered;
+
     stop = false;
     packetnum = 0;
     printf("initialized\n");
@@ -32,6 +34,21 @@ void    SnifferThread::run(){
     if(handle==NULL){
         printf("Couldn't open device %s, %s",device,error_buffer);
         return;
+    }
+
+    // find properties for the device
+    if (pcap_lookupnet(device, &this->net, &this->mask, error_buffer) == -1) {
+        fprintf(stderr, "Couldn't get netmask for device %s: %s\n", device, error_buffer);
+        net = 0;
+        mask = 0;
+    }
+
+    /* setup filter */
+    if (pcap_compile(handle, &this->fp, filter_exp, 0, net)==-1) {
+        fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
+    }
+    if (pcap_setfilter(handle, &this->fp) == -1) {
+        fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
     }
 
     /* capture packet */
