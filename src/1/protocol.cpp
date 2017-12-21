@@ -1,257 +1,239 @@
 #include "protocol.h"
 
-/*
- * print data in rows of 16 bytes: offset   hex   ascii
- *
- * 00000   47 45 54 20 2f 20 48 54  54 50 2f 31 2e 31 0d 0a   GET / HTTP/1.1..
- */
-void
-print_hex_ascii_line(const u_char *payload, int len, int offset)
-{
-
- int i;
- int gap;
- const u_char *ch;
-
- /* offset */
- printf("%05d   ", offset);
-
- /* hex */
- ch = payload;
- for(i = 0; i < len; i++) {
-  printf("%02x ", *ch);
-  ch++;
-  /* print extra space after 8th byte for visual aid */
-  if (i == 7)
-   printf(" ");
- }
- /* print space to handle line less than 8 bytes */
- if (len < 8)
-  printf(" ");
-
- /* fill hex gap with spaces if not full line */
- if (len < 16) {
-  gap = 16 - len;
-  for (i = 0; i < gap; i++) {
-   printf("   ");
-  }
- }
- printf("   ");
-
- /* ascii (if printable) */
- ch = payload;
- for(i = 0; i < len; i++) {
-  if (isprint(*ch))
-   printf("%c", *ch);
-  else
-   printf(".");
-  ch++;
- }
-
- printf("\n");
-
-return;
-}
-
-/*
- * print packet payload data (avoid printing binary data)
- */
-void
-print_payload(const u_char *payload, int len)
-{
-
- int len_rem = len;
- int line_width = 16;   /* number of bytes per line */
- int line_len;
- int offset = 0;     /* zero-based offset counter */
- const u_char *ch = payload;
-
- if (len <= 0)
-  return;
-
- /* data fits on one line */
- if (len <= line_width) {
-  print_hex_ascii_line(ch, len, offset);
-  return;
- }
-
- /* data spans multiple lines */
- for ( ;; ) {
-  /* compute current line length */
-  line_len = line_width % len_rem;
-  /* print line */
-  print_hex_ascii_line(ch, line_len, offset);
-  /* compute total remaining */
-  len_rem = len_rem - line_len;
-  /* shift pointer to remaining bytes to print */
-  ch = ch + line_len;
-  /* add offset */
-  offset = offset + line_width;
-  /* check if we have line width chars or less */
-  if (len_rem <= line_width) {
-   /* print last line and get out */
-   print_hex_ascii_line(ch, len_rem, offset);
-   break;
-  }
- }
-
-return;
-}
-
-/*
- * dissect/print packet
- */
+/* dissect/print packet*/
 void packet_info(const struct pcap_pkthdr *header, const u_char *packet, QList<QStandardItem *> *row)
 {
- static int count = 1;                   /* packet counter */
+    static int count = 1;                   /* packet counter */
 
- /* declare pointers to packet headers */
- const struct sniff_ethernet *ethernet;  /* The ethernet header [1] */
- int size_ip;
- row->append(new QStandardItem(QString::number(count++)));
- row->append(new QStandardItem(QString(ctime((const time_t *)&header->ts.tv_sec))));
+    /* declare pointers to packet headers */
+    const struct sniff_ethernet *ethernet;  /* The ethernet header [1] */
+    row->append(new QStandardItem(QString::number(count++)));
+    row->append(new QStandardItem(QString(ctime((const time_t *)&header->ts.tv_sec))));
 
- /* define ethernet header */
- ethernet = (struct sniff_ethernet*)(packet);
-
-if(ntohs(ethernet->ether_type)==IP){
- const struct sniff_ip *ip;
- /* define/compute ip header offset */
- ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
- size_ip = IP_HL(ip)*4;
- if (size_ip < 20) {
-  printf("   * Invalid IP header length: %u bytes\n", size_ip);
-  return;
- }
-
- /* print source and destination IP addresses */
- printf("       From: %s\n", inet_ntoa(ip->ip_src));
- printf("         To: %s\n", inet_ntoa(ip->ip_dst));
-
-row->append(new QStandardItem(QString(inet_ntoa(ip->ip_src))));
-row->append(new QStandardItem(QString(inet_ntoa(ip->ip_dst))));
-row->append(new QStandardItem(QString::number(ip->ip_len)));
-
- /* determine protocol */
- switch(ip->ip_p) {
-  case IPPROTO_TCP:
-    printf("   Protocol: TCP\n");
-    row->append(new QStandardItem("TCP"));
-    break;
-  case IPPROTO_UDP:
-    printf("   Protocol: UDP\n");
-    row->append(new QStandardItem("UDP"));
-    break;
-  case IPPROTO_ICMP:
-    printf("   Protocol: ICMP\n");
-    row->append(new QStandardItem("ICMP"));
-    break;
-  case IPPROTO_IP:
-    printf("   Protocol: IP\n");
-    row->append(new QStandardItem("IP"));
-    break;
-  default:
-    printf("   Protocol: unknown\n");
-    row->append(new QStandardItem("UNKNOWN"));
-    break;
- }
-}
-else{
-    const struct sniff_arp *arp;
-    arp = (struct sniff_arp*)(packet + SIZE_ETHERNET);
-    printf("arp");
-
-    row->append(new QStandardItem(QString(inet_ntoa(arp->arp_sip))));
-    row->append(new QStandardItem("Broadcast"));
-    row->append(new QStandardItem(QString::number(arp->ptlen)));
-    row->append(new QStandardItem("ARP"));
-}
-
-}
-
-void
-got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
-{
-
- static int count = 1;                   /* packet counter */
-
- /* declare pointers to packet headers */
- const struct sniff_ethernet *ethernet;  /* The ethernet header [1] */
- const struct sniff_ip *ip;              /* The IP header */
- const struct sniff_tcp *tcp;            /* The TCP header */
- const struct sniff_udp *udp;
- const struct sniff_icmp *icmp;
- const struct sniff_arp *arp;
- const char *payload;                    /* Packet payload */
-
- int size_ip;
- int size_tcp;
- int size_payload;
-
- printf("\nPacket number %d:\n", count);
- count++;
-
- /* define ethernet header */
- ethernet = (struct sniff_ethernet*)(packet);
-
-if(ntohs(ethernet->ether_type)==IP){
-
- /* define/compute ip header offset */
- ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
- size_ip = IP_HL(ip)*4;
- if (size_ip < 20) {
-  printf("   * Invalid IP header length: %u bytes\n", size_ip);
-  return;
- }
-
- /* print source and destination IP addresses */
- printf("       From: %s\n", inet_ntoa(ip->ip_src));
- printf("         To: %s\n", inet_ntoa(ip->ip_dst));
-
- /* determine protocol */
- switch(ip->ip_p) {
-  case IPPROTO_TCP:
-    printf("   Protocol: TCP\n");
-    tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
-    printf("   Src port: %d\n", ntohs(tcp->th_sport));
-    printf("   Dst port: %d\n", ntohs(tcp->th_dport));
-    payload = reinterpret_cast<const char *>((u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp));
-    size_payload = ntohs(ip->ip_len) - (size_ip + size_tcp);
-    if (size_payload > 0) {
-      printf("   Payload (%d bytes):\n", size_payload);
-      print_payload(reinterpret_cast<const u_char*>(payload), size_payload);
-   }
-    return;
-  case IPPROTO_UDP:
-    printf("   Protocol: UDP\n");
-    udp = (struct sniff_udp*)(packet + SIZE_ETHERNET + size_ip);
-    printf("   Src port: %d\n", ntohs(udp->udp_sp));
-    printf("   Dst port: %d\n", ntohs(udp->udp_dp));
-    payload = reinterpret_cast<const char *>((u_char *)(packet + 16 * 4));
-    size_payload = ntohs(ip->ip_len) - (size_ip + 16 * 4);
-    if (size_payload > 0) {
-      printf("   Payload (%d bytes):\n", size_payload);
-      print_payload(reinterpret_cast<const u_char*>(payload), size_payload);
-   }
-    return;
-  case IPPROTO_ICMP:
-    printf("   Protocol: ICMP\n");
-    icmp = (struct sniff_icmp*)(packet + SIZE_ETHERNET + size_ip);
-    payload = reinterpret_cast<const char *>((u_char *)(packet + 63));
-    size_payload = ntohs(ip->ip_len) - (size_ip + 64);
-    if (size_payload > 0) {
-      printf("   Payload (%d bytes):\n", size_payload);
-      print_payload(reinterpret_cast<const u_char*>(payload), size_payload);
+    /* define ethernet header */
+    ethernet = (struct sniff_ethernet*)(packet);
+    switch(ntohs(ethernet->ether_type)){
+    case IPV4:  handle_ipv4((packet+SIZE_ETHERNET),row);break;
+    case ARP:   handle_arp(packet+SIZE_ETHERNET,row);break;
+    case IPV6:  handle_ipv6(packet+SIZE_ETHERNET,row);break;
     }
-    return;
-  case IPPROTO_IP:
-    printf("   Protocol: IP\n");
-    return;
-  default:
-    printf("   Protocol: unknown\n");
-    return;
- }
+    row->insert(5,new QStandardItem(QString::number(header->caplen)));
 }
-else printf("arp");
-return;
+void handle_ipv4(const u_char *packet,QList<QStandardItem *> *row){
+    const struct sniff_ipv4 *ip;
+    int size_ip;
+    ip = (struct sniff_ipv4*)packet;
+    size_ip = IP_HL(ip)*4;
+    if (size_ip < 20) {
+     printf("   * Invalid IP header length: %u bytes\n", size_ip);
+     return;
+    }
+    /* source and destination IP addresses */
+    row->append(new QStandardItem(QString(inet_ntoa(ip->ip_src))));
+    row->append(new QStandardItem(QString(inet_ntoa(ip->ip_dst))));
+    /* determine protocol */
+    switch(ip->ip_p) {
+    case IPPROTO_TCP:
+       printf("   Protocol: TCP\n");
+       handle_tcp((packet+size_ip),row);
+       break;
+     case IPPROTO_UDP:
+       printf("   Protocol: UDP\n");
+       handle_udp((packet+size_ip),row);
+       break;
+     case IPPROTO_ICMP:
+       printf("   Protocol: ICMP\n");
+       handle_icmp((packet+size_ip),row);
+       break;
+     default:
+       printf("   Protocol: unknown\n");
+       row->append(new QStandardItem("UNKNOWN"));
+       break;
+    }
+}
+void handle_ipv6(const u_char *packet,QList<QStandardItem *> *row){
+    const struct sniff_ipv6 *ip;
+    ip = (struct sniff_ipv6 *)packet;
+
+    /* source and destination IPV6 addresses */
+    char buffer[INET6_ADDRSTRLEN];
+    printf("     Source:%s\n", inet_ntop(AF_INET6, ip->ip6_src, buffer, sizeof(buffer)));
+    row->append(new QStandardItem(QString(buffer)));
+    printf("Destination:%s\n", inet_ntop(AF_INET6, ip->ip6_dst, buffer, sizeof(buffer)));
+    row->append(new QStandardItem(QString(buffer)));
+
+    /* determine protocol */
+    switch(ip->ip6_p) {
+    case IPPROTO_TCP:
+       printf("   Protocol: TCP\n");
+       handle_tcp((packet+IPV6_HEADER_LENGTH),row);
+       break;
+     case IPPROTO_UDP:
+       printf("   Protocol: UDP\n");
+       handle_udp((packet+IPV6_HEADER_LENGTH),row);
+       break;
+     case IPPROTO_ICMP:
+       printf("   Protocol: ICMP\n");
+       handle_icmp((packet+IPV6_HEADER_LENGTH),row);
+       break;
+     default:
+       printf("   Protocol: unknown\n");
+       row->append(new QStandardItem("UNKNOWN"));
+       break;
+    }
+}
+void handle_arp(const u_char *packet,QList<QStandardItem *> *row){
+    const struct sniff_arp *arp;
+    arp = (struct sniff_arp *)packet;
+    row->append(new QStandardItem(QString(inet_ntoa(arp->arp_sip))));
+    row->append(new QStandardItem(QString(inet_ntoa(arp->arp_tip))));
+    row->append(new QStandardItem(QString("ARP")));
+}
+void handle_tcp(const u_char *packet,QList<QStandardItem *> *row){
+    const struct sniff_tcp *tcp;
+    tcp = (struct sniff_tcp *)packet;
+    row->append(new QStandardItem(QString("TCP")));
+}
+void handle_udp(const u_char *packet,QList<QStandardItem *> *row){
+    const struct sniff_udp *udp;
+    udp = (struct sniff_udp *)packet;
+    row->append(new QStandardItem(QString("UDP")));
+}
+void handle_icmp(const u_char *packet,QList<QStandardItem *> *row){
+    const struct sniff_icmp *icmp;
+    icmp = (struct sniff_icmp *)packet;
+    row->append(new QStandardItem(QString("ICMP")));
+}
+
+/* insert packet details into model */
+void packet_details(const u_char *packet,QStandardItemModel *details){
+    /* add root to details */
+    QStandardItem *root = new QStandardItem(QString("Ethernet II"));
+    details->appendRow(root);
+
+    const struct sniff_ethernet *ethernet;
+    ethernet = (struct sniff_ethernet*)(packet);
+
+    /* add leaf */
+    int i;
+    QString dh("Destination Address:  "),
+            sh("Source Address:  "),
+            pro("Ethernet Type:  ");
+    char tmp[4];
+    for(i=0;i<6;i++){
+        snprintf(tmp,sizeof(tmp),((i==5)?"%02x":"%02x:"),*(ethernet->ether_dhost+i));
+        dh.append(tmp);
+        snprintf(tmp,sizeof(tmp),((i==5)?"%02x":"%02x:"),*(ethernet->ether_shost+i));
+        sh.append(tmp);
+    }
+    QStandardItem *dhitem = new QStandardItem(dh);
+    QStandardItem *shitem = new QStandardItem(sh);
+    root->appendRow(dhitem);
+    root->appendRow(shitem);
+
+    switch(ntohs(ethernet->ether_type)){
+    case IPV4:{
+        pro.append(QString("IPV4(0x0800)"));
+        QStandardItem *proitem = new QStandardItem(pro);
+        root->appendRow(proitem);
+        ipv4_details(packet+SIZE_ETHERNET,details);
+        break;
+    }
+    case ARP:{
+        pro.append(QString("ARP(0x0806)"));
+        QStandardItem *proitem = new QStandardItem(pro);
+        root->appendRow(proitem);
+        arp_details(packet+SIZE_ETHERNET,details);
+        break;
+    }
+    case IPV6:{
+        pro.append(QString("IPV6(0x86dd)"));
+        QStandardItem *proitem = new QStandardItem(pro);
+        root->appendRow(proitem);
+        ipv6_details(packet+SIZE_ETHERNET,details);
+        break;
+    }
+    }
+
+}
+void ipv4_details(const u_char *packet,QStandardItemModel *details){
+    QStandardItem *root = new QStandardItem(QString("Internet Protocol Version 4"));
+    details->appendRow(root);
+
+    const struct sniff_ipv4 *ip;
+    int size_ip;
+    ip = (struct sniff_ipv4*)packet;
+    size_ip = IP_HL(ip)*4;
+
+    QString ver("IP Version:  "),
+            hl("Header Length:  "),
+            tos("Type Of Service:  "),
+            tl("Total Length:  "),
+            id("Identification:  "),
+            flag("Flags:  "),
+            fo("Fragment Offset:  "),
+            ttl("Time To Live:  "),
+            pro("Protocol:  "),
+            hc("Header Checksum:  "),
+            sip("Source IP:  "),
+            dip("Destination IP:  ");
+    QStandardItem   *veritem = new QStandardItem(ver),
+                    *hlitem = new QStandardItem(hl),
+                    *tositem = new QStandardItem(tos),
+                    *tlitem = new QStandardItem(tl),
+                    *iditem = new QStandardItem(id),
+                    *flagitem = new QStandardItem(flag),
+                    *foitem = new QStandardItem(fo),
+                    *ttlitem = new QStandardItem(ttl),
+                    *proitem = new QStandardItem(pro),
+                    *hcitem = new QStandardItem(hc),
+                    *sipitem = new QStandardItem(sip),
+                    *dipitem = new QStandardItem(dip);
+    root->appendRow(veritem);
+    root->appendRow(hlitem);
+    root->appendRow(tositem);
+    root->appendRow(tlitem);
+    root->appendRow(iditem);
+    root->appendRow(flagitem);
+    root->appendRow(foitem);
+    root->appendRow(ttlitem);
+
+    switch(ip->ip_p) {
+    case IPPROTO_TCP:{
+       tcp_details((packet+size_ip),details);
+       break;
+    }
+     case IPPROTO_UDP:{
+       udp_details((packet+size_ip),details);
+       break;
+    }
+     case IPPROTO_ICMP:{
+       icmp_details((packet+size_ip),details);
+       break;
+    }
+    }
+    root->appendRow(proitem);
+    root->appendRow(hcitem);
+    root->appendRow(sipitem);
+    root->appendRow(dipitem);
+}
+void ipv6_details(const u_char *packet,QStandardItemModel *details){
+    QStandardItem *root = new QStandardItem(QString("Internet Protocol Version 6"));
+    details->appendRow(root);
+}
+void arp_details(const u_char *packet,QStandardItemModel *details){
+    QStandardItem *root = new QStandardItem(QString("Address Resolution Protocol"));
+    details->appendRow(root);
+}
+void tcp_details(const u_char *packet,QStandardItemModel *details){
+    QStandardItem *root = new QStandardItem(QString("Transmission Control Protocol"));
+    details->appendRow(root);
+}
+void udp_details(const u_char *packet,QStandardItemModel *details){
+    QStandardItem *root = new QStandardItem(QString("User Datagram Protocol"));
+    details->appendRow(root);
+}
+void icmp_details(const u_char *packet,QStandardItemModel *details){
+    QStandardItem *root = new QStandardItem(QString("Internet Control Message Protocol"));
+    details->appendRow(root);
 }

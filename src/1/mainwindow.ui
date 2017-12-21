@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>647</width>
-    <height>439</height>
+    <width>802</width>
+    <height>498</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,30 +17,20 @@
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>130</x>
       <y>10</y>
-      <width>86</width>
-      <height>25</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QTreeView" name="treeView_2">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>231</y>
-      <width>1031</width>
-      <height>251</height>
+      <width>111</width>
+      <height>31</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="btn_run">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>280</x>
       <y>10</y>
-      <width>89</width>
-      <height>25</height>
+      <width>101</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
@@ -50,10 +40,10 @@
    <widget class="QPushButton" name="btn_stop">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>400</x>
       <y>10</y>
-      <width>89</width>
-      <height>25</height>
+      <width>101</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
@@ -63,14 +53,61 @@
    <widget class="QTableView" name="packetTableView">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>40</y>
-      <width>651</width>
-      <height>192</height>
+      <x>20</x>
+      <y>50</y>
+      <width>761</width>
+      <height>191</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTreeView" name="packetDetails">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>250</y>
+      <width>371</width>
+      <height>231</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_stop_2">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>10</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>clear</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="device">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Choose device:</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="packetDataview">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>250</y>
+      <width>371</width>
+      <height>231</height>
      </rect>
     </property>
    </widget>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

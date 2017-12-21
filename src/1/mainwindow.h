@@ -7,6 +7,7 @@
 #include <QtWidgets>
 #include <QString>
 #include <string>
+#include <QStringListModel>
 #include "sniffer.h"
 #include "snifferthread.h"
 #include "protocol.h"
@@ -27,6 +28,8 @@ private slots:
     void on_btn_run_clicked();
     void on_btn_stop_clicked();
 
+    void on_packetTableView_doubleClicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow          *ui;
     sniffer                 *msniffer;
@@ -35,6 +38,7 @@ private:
     char                    *device;
     QStandardItemModel      *packetModel;
     QSortFilterProxyModel   *packetModelProxy;
+    QStandardItemModel      *packetdetails;
 };
 
 #endif // MAINWINDOW_H

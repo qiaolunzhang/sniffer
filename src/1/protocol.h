@@ -15,6 +15,7 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QList>
+#include <QPlainTextEdit>
 /* default snap length(maximum bytes per packet to capture) */
 #define SNAP_LEN 1518
 /* ethernet headers are always 14 bytes [1] */
@@ -26,16 +27,17 @@
 
 /* Ethernet header */
 struct sniff_ethernet {
-  u_char ether_dhost[ETHER_ADDR_LEN];
-  u_char ether_shost[ETHER_ADDR_LEN];
-  u_short ether_type; /* IP? ARP? RARP? etc */
-  #define IP 0x0800
-  #define ARP 0x0806
+    u_char ether_dhost[ETHER_ADDR_LEN];
+    u_char ether_shost[ETHER_ADDR_LEN];
+    u_short ether_type; /* IP? ARP? RARP? etc */
+    #define     IPV4      0x0800
+    #define     ARP     0x0806
+    #define     IPV6    0x08dd
 };
 
 /* IP header */
 /* IP header */
-struct sniff_ip {
+struct sniff_ipv4 {
         u_char  ip_vhl;                 /* version << 4 | header length >> 2 */
         u_char  ip_tos;                 /* type of service */
         u_short ip_len;                 /* total length */
@@ -101,21 +103,38 @@ struct sniff_arp
 	u_short arp_ht,arp_pt;		/*hardware type & protocol type*/
 	u_char	arp_htlen,ptlen;	/*hardware length & protocol length*/
 	u_short arp_opcode;		/*type*/
-	u_char	arp_sp[6];		/*source physics*/
-	in_addr arp_sip;		/*source ip */
-	u_char	arp_tp[6];		/*target physics*/
-	in_addr arp_tip;		/*target ip*/
+    u_char	arp_sp[ETHER_ADDR_LEN];		/*source physics*/
+    struct in_addr arp_sip;		/*source ip */
+    u_char	arp_tp[ETHER_ADDR_LEN];		/*target physics*/
+    struct in_addr arp_tip;		/*target ip*/
 };
 
-void
-got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
+/* IPv6 header */
+struct sniff_ipv6 {
+    uint32_t    ip6_vtcfl;          //version, traffic class, flow label
+    uint16_t    ip6_len;			//The length of the payload
+    uint8_t     ip6_p;              //The next header
+    uint8_t     ip6_hop;			//The hop limit
+    char        ip6_src[16];		//The 128 bit source address
+    char        ip6_dst[16];		//The 128 bit destination address
+#define IPV6_HEADER_LENGTH 	40
+#define IPV6_VERSION(ip6) 	((ip6)->ip6_vtcfl & 0xF0000000)
+};
+
 
 void packet_info(const struct pcap_pkthdr *header,const u_char *packet,QList<QStandardItem *>*row);
+void handle_ipv4(const u_char *packet,QList<QStandardItem *> *row);
+void handle_ipv6(const u_char *packet,QList<QStandardItem *> *row);
+void handle_arp(const u_char *packet,QList<QStandardItem *> *row);
+void handle_tcp(const u_char *packet,QList<QStandardItem *> *row);
+void handle_udp(const u_char *packet,QList<QStandardItem *> *row);
+void handle_icmp(const u_char *packet,QList<QStandardItem *> *row);
 
-void
-print_payload(const u_char *payload, int len);
-
-void
-print_hex_ascii_line(const u_char *payload, int len, int offset);
-
+void packet_details(const u_char *packet,QStandardItemModel *details);
+void ipv4_details(const u_char *packet,QStandardItemModel *details);
+void ipv6_details(const u_char *packet,QStandardItemModel *details);
+void arp_details(const u_char *packet,QStandardItemModel *details);
+void tcp_details(const u_char *packet,QStandardItemModel *details);
+void udp_details(const u_char *packet,QStandardItemModel *details);
+void icmp_details(const u_char *packet,QStandardItemModel *details);
 #endif
