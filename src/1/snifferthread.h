@@ -33,6 +33,8 @@ private:
     QStandardItemModel  *packetmodel;
     QStandardItemModel  *packetdetails;
     std::vector<unsigned char *> Data;
+    std::vector<unsigned char *> Data_after_reasm;
+    std::vector<ip_vector> ip_vector_queue;
 
 
     void				ip_frag_reasm();
