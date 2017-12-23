@@ -38,7 +38,9 @@ private:
 
 
     void				ip_frag_reasm();
+    void				check_ip_queue(struct ip_vector * ip_vector_check);
     void				ip_belong_to_packet(size_t hash, int index_packet);
+    void				craft_packet(int ip_vector_craft);
 };
 
 #endif // SNIFFERTHREAD_H
