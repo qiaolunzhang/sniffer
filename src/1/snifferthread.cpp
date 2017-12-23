@@ -106,18 +106,50 @@ void    SnifferThread::FillDetails(QStandardItemModel *packetdetails,int index,i
 
 void	SnifferThread::IpDefragment() {
     std::vector <unsigned char *> :: iterator i;
-    int hash_returned;
-    int *index_returned;
+    size_t hash_returned;
+    int index_packet = 0;
     for (i = this->Data.begin(); i != this->Data.end(); i++) {
         if (ip_is_fragment(*i)) {
             hash_returned = ip_defrag(*i);
+            std::cout << "check if hash is same " << hash_returned << std::endl;
             // check if the hash exists, if not create
-            // insert the index_returned
+            this->ip_belong_to_packet(hash_returned, index_packet);
         }
+        index_packet = index_packet + 1;
     }
+
+    // check hash
+    /*
+    std::vector<ip_vector> :: iterator j;
+    for (j = ip_vector_queue.begin(); j != ip_vector_queue.end(); ++j) {
+        std::cout << "the hash stored now is " << j->hash_fragment << std::endl;
+    }
+    */
     // this->ip_frag_reasm();
 }
 
+void	SnifferThread::ip_belong_to_packet(size_t hash, int index_packet) {
+    std::vector<ip_vector> :: iterator i;
+    if (ip_vector_queue.empty()) {
+        struct ip_vector ip_vector_new;
+        ip_vector_new.hash_fragment = hash;
+        ip_vector_new.flag = false;
+        ip_vector_queue.push_back(ip_vector_new);
+
+    }
+    else {
+        for (i = ip_vector_queue.begin(); i != ip_vector_queue.end(); ++i) {
+            if (i->hash_fragment == hash) {
+                i->ip_vector_fragment.push_back(index_packet);
+                return;
+            }
+        }
+        struct ip_vector ip_vector_new;
+        ip_vector_new.hash_fragment = hash;
+        ip_vector_new.flag = false;
+        ip_vector_queue.push_back(ip_vector_new);
+    }
+}
 
 
 void	SnifferThread::ip_frag_reasm() {

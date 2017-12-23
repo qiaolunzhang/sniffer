@@ -9,6 +9,7 @@ bool 	ip_is_fragment(unsigned char *data_check) {
     case ARP: return false;
     case IPV6: return false;
     }
+    return false;
 }
 
 bool	ip_is_fragment_ipv4(unsigned char *data_check) {
@@ -36,7 +37,7 @@ bool	ip_is_fragment_ipv4(unsigned char *data_check) {
     }
 }
 
-int 	ip_defrag(unsigned char *data_check) {
+size_t	ip_defrag(unsigned char *data_check) {
     const struct sniff_ipv4 *ipv4_check;
     ipv4_check = (struct sniff_ipv4 *)(data_check + SIZE_ETHERNET);
     //int length = 2(ip_id: short) + 1 (ip_tos: char) + 4 (dst) + 4(src) = 11

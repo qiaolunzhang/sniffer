@@ -38,6 +38,7 @@ private:
 
 
     void				ip_frag_reasm();
+    void				ip_belong_to_packet(size_t hash, int index_packet);
 };
 
 #endif // SNIFFERTHREAD_H
