@@ -85,8 +85,11 @@ void handle_ipv6(const u_char *packet,QList<QStandardItem *> *row){
 void handle_arp(const u_char *packet,QList<QStandardItem *> *row){
     const struct sniff_arp *arp;
     arp = (struct sniff_arp *)packet;
-    row->append(new QStandardItem(QString(inet_ntoa(arp->arp_sip))));
-    row->append(new QStandardItem(QString(inet_ntoa(arp->arp_tip))));
+    char buffer[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &arp->arp_sip, buffer, INET_ADDRSTRLEN);
+    row->append(new QStandardItem(buffer));
+    inet_ntop(AF_INET, &arp->arp_tip, buffer, INET_ADDRSTRLEN);
+    row->append(new QStandardItem(QString(buffer)));
     row->append(new QStandardItem(QString("ARP")));
 }
 void handle_tcp(const u_char *packet,QList<QStandardItem *> *row){
