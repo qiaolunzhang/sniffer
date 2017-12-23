@@ -30,10 +30,10 @@ struct sniff_ethernet {
     u_char ether_dhost[ETHER_ADDR_LEN];
     u_char ether_shost[ETHER_ADDR_LEN];
     u_short ether_type; /* IP? ARP? RARP? etc */
-    #define     IPV4      0x0800
-    #define     ARP     0x0806
-    #define     IPV6    0x08dd
 };
+#define     IPV4        0x0800
+#define     ARP         0x0806
+#define     IPV6        0x08dd
 
 /* IP header */
 /* IP header */
@@ -83,18 +83,18 @@ struct sniff_tcp {
 /* UDP header */
 struct sniff_udp
 {
-	u_short udp_sp;              	/*source port */
-  u_short udp_dp;                	/* destination port*/
+    u_short udp_sp;              	/*source port */
+    u_short udp_dp;                	/* destination port*/
 	u_short udp_l;                	/* udp length */
-  u_short udp_cs;                	/* check sum*/
+    u_short udp_cs;                	/* check sum*/
 };
 
 /* ICMP header */
 struct sniff_icmp
 {
-	u_char	icmp_t;               	/*type*/
-	u_char	icmp_c;			/*code*/
-	u_short	icmp_cs;		/*check sum*/
+    u_char	icmp_t;             /*type*/
+    u_char	icmp_c;             /*code*/
+    u_short	icmp_cs;            /*check sum*/
 };
 
 /* ARP header */
@@ -104,9 +104,9 @@ struct sniff_arp
 	u_char	arp_htlen,ptlen;	/*hardware length & protocol length*/
 	u_short arp_opcode;		/*type*/
     u_char	arp_sp[ETHER_ADDR_LEN];		/*source physics*/
-    struct in_addr arp_sip;		/*source ip */
+    char    arp_sip[4];		/*source ip */
     u_char	arp_tp[ETHER_ADDR_LEN];		/*target physics*/
-    struct in_addr arp_tip;		/*target ip*/
+    char    arp_tip[4];		/*target ip*/
 };
 
 /* IPv6 header */
@@ -118,7 +118,9 @@ struct sniff_ipv6 {
     char        ip6_src[16];		//The 128 bit source address
     char        ip6_dst[16];		//The 128 bit destination address
 #define IPV6_HEADER_LENGTH 	40
-#define IPV6_VERSION(ip6) 	((ip6)->ip6_vtcfl & 0xF0000000)
+#define IPV6_VERSION(ip6) 	((ip6)->ip6_vtcfl & 0xf0000000)
+#define IPV6_TC(ip6) 	((ip6)->ip6_vtcfl & 0x0ff00000)
+#define IPV6_FL(ip6) 	((ip6)->ip6_vtcfl & 0x000fffff)
 };
 
 
