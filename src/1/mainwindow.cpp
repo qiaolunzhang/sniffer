@@ -104,3 +104,9 @@ void MainWindow::on_pushButton_clicked()
 {
    snifferthread->IpDefragment();
 }
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    save_dialog = new Save_Dialog;
+    save_dialog->show();
+}

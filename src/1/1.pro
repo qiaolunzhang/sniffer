@@ -31,14 +31,17 @@ SOURCES += \
     sniffer.cpp \
     snifferthread.cpp \
     protocol.cpp \
-    ip_defrag.cpp
+    ip_defrag.cpp \
+    save_dialog.cpp
 
 HEADERS += \
         mainwindow.h \
     sniffer.h \
     snifferthread.h \
     protocol.h \
-    ip_defrag.h
+    ip_defrag.h \
+    save_dialog.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    save_dialog.ui
