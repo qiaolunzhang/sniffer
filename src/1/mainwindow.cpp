@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     packetdetails = new QStandardItemModel(this);
     ui->packetDetails->setModel(packetdetails);
     ui->packetDetails->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->packetDetails->setHeaderHidden(true);
 
     ui->packetDataview->setWordWrapMode(QTextOption::NoWrap);
 

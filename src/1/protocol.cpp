@@ -3,8 +3,6 @@
 /* dissect/print packet*/
 void packet_info(const struct pcap_pkthdr *header, const u_char *packet, QList<QStandardItem *> *row)
 {
-    static int count = 1;                   /* packet counter */
-
     /* declare pointers to packet headers */
     const struct sniff_ethernet *ethernet;  /* The ethernet header [1] */
     row->append(new QStandardItem(QString(ctime((const time_t *)&header->ts.tv_sec))));
@@ -90,21 +88,82 @@ void handle_arp(const u_char *packet,QList<QStandardItem *> *row){
     inet_ntop(AF_INET, &arp->arp_tip, buffer, INET_ADDRSTRLEN);
     row->append(new QStandardItem(QString(buffer)));
     row->append(new QStandardItem(QString("ARP")));
+
+    QString info;
+    switch(ntohs(arp->arp_opcode)){
+    case ARP_REQ:{
+        info.append(QString("Who has "));
+        inet_ntop(AF_INET, &arp->arp_tip, buffer, INET_ADDRSTRLEN);
+        info.append(buffer);
+        info.append(QString("? Tell "));
+        inet_ntop(AF_INET, &arp->arp_sip, buffer, INET_ADDRSTRLEN);
+        info.append(buffer);
+        break;
+    }
+    case ARP_REP:{
+        inet_ntop(AF_INET, &arp->arp_tip, buffer, INET_ADDRSTRLEN);
+        info.append(buffer);
+        info.append(QString(" is at "));
+        char tmp[4];
+        for(int i=0;i<6;i++){
+            snprintf(tmp,sizeof(tmp),((i==5)?"%02x":"%02x:"),*(arp->arp_tp+i));
+            info.append(tmp);
+        }
+        break;
+    }
+    default:info.append(QString("UNKNOWN"));
+    }
+    row->append(new QStandardItem(QString(info)));
 }
 void handle_tcp(const u_char *packet,QList<QStandardItem *> *row){
     const struct sniff_tcp *tcp;
     tcp = (struct sniff_tcp *)packet;
     row->append(new QStandardItem(QString("TCP")));
+
+    QString info;
+    info.append(QString::number(ntohs(tcp->th_sport)));
+    info.append(QString(" to "));
+    info.append(QString::number(ntohs(tcp->th_dport)));
+    info.append(" [ ");
+    if((tcp->th_flags&TH_FIN)==TH_FIN)info.append("FIN ");
+    if((tcp->th_flags&TH_SYN)==TH_SYN)info.append("SYN ");
+    if((tcp->th_flags&TH_RST)==TH_RST)info.append("RST ");
+    if((tcp->th_flags&TH_PUSH)==TH_PUSH)info.append("PUSH ");
+    if((tcp->th_flags&TH_ACK)==TH_ACK)info.append("ACK ");
+    if((tcp->th_flags&TH_URG)==TH_URG)info.append("URG ");
+    if((tcp->th_flags&TH_ECE)==TH_ECE)info.append("ECE ");
+    if((tcp->th_flags&TH_CWR)==TH_CWR)info.append("CWR ");
+    info.append("] Seq=");
+    info.append(QString::number(ntohl(tcp->th_seq)));
+    info.append(" Ack=");
+    info.append(QString::number(ntohl(tcp->th_ack)));
+    info.append(" Win=");
+    info.append(QString::number(ntohs(tcp->th_win)));
+
+    row->append(new QStandardItem(info));
 }
 void handle_udp(const u_char *packet,QList<QStandardItem *> *row){
     const struct sniff_udp *udp;
     udp = (struct sniff_udp *)packet;
     row->append(new QStandardItem(QString("UDP")));
+
+    QString info;
+    info.append(QString::number(ntohs(udp->udp_sp)));
+    info.append(QString(" to "));
+    info.append(QString::number(ntohs(udp->udp_dp)));
+    info.append(QString(" Len="));
+    info.append(QString::number(ntohs(udp->udp_l)));
+    row->append(new QStandardItem(info));
+
 }
 void handle_icmp(const u_char *packet,QList<QStandardItem *> *row){
     const struct sniff_icmp *icmp;
     icmp = (struct sniff_icmp *)packet;
     row->append(new QStandardItem(QString("ICMP")));
+    switch(icmp->icmp_t){
+    case ICMP_REPLY:row->append(new QStandardItem(QString("Echo (ping) reply)")));break;
+    case ICMP_REQUEST:row->append(new QStandardItem(QString("Echo (ping) request)")));break;
+    }
 }
 
 /* insert packet details into model */
@@ -323,8 +382,8 @@ void arp_details(const u_char *packet,QStandardItemModel *details){
     hs.append(QString::number(arp->arp_htlen));
     ps.append(QString::number(arp->ptlen));
     switch(ntohs(arp->arp_opcode)){
-    case 0x0001:o.append(QString("request(1)"));break;
-    case 0x0002:o.append(QString("reply(2)"));break;
+    case ARP_REQ:o.append(QString("request(1)"));break;
+    case ARP_REP:o.append(QString("reply(2)"));break;
     default:o.append(QString("UNKNOWN"));
     }
     int i;
@@ -357,12 +416,101 @@ void arp_details(const u_char *packet,QStandardItemModel *details){
 void tcp_details(const u_char *packet,QStandardItemModel *details){
     QStandardItem *root = new QStandardItem(QString("Transmission Control Protocol"));
     details->appendRow(root);
+
+    const struct sniff_tcp *tcp;
+    tcp = (struct sniff_tcp *)packet;
+    int size_tcp = TH_OFF(tcp)*4;
+
+    QString sp("Source Port:  "),
+            dp("Destination Port:  "),
+            sn("Sequence Number:  "),
+            an("Acknowledgment Number:  "),
+            hl("Header Length:  "),
+            flag("Flags:  "),
+            ws("Window Size value:  "),
+            cs("Checksum:  "),
+            up("Urgent Pointer:  ");
+    sp.append(QString::number(ntohs(tcp->th_sport)));
+    dp.append(QString::number(ntohs(tcp->th_dport)));
+    sn.append(QString::number(ntohl(tcp->th_seq)));
+    an.append(QString::number(ntohl(tcp->th_ack)));
+    hl.append(QString::number(size_tcp));
+    hl.append(QString("(bytes)"));
+
+    char tmp5[5],tmp7[7];
+    snprintf(tmp5,sizeof(tmp5),"0x%02x",tcp->th_flags);
+    flag.append(tmp5);
+    flag.append('(');
+    if((tcp->th_flags&TH_FIN)==TH_FIN)flag.append("FIN ");
+    if((tcp->th_flags&TH_SYN)==TH_SYN)flag.append("SYN ");
+    if((tcp->th_flags&TH_RST)==TH_RST)flag.append("RST ");
+    if((tcp->th_flags&TH_PUSH)==TH_PUSH)flag.append("PUSH ");
+    if((tcp->th_flags&TH_ACK)==TH_ACK)flag.append("ACK ");
+    if((tcp->th_flags&TH_URG)==TH_URG)flag.append("URG ");
+    if((tcp->th_flags&TH_ECE)==TH_ECE)flag.append("ECE ");
+    if((tcp->th_flags&TH_CWR)==TH_CWR)flag.append("CWR ");
+    flag.append(')');
+    ws.append(QString::number(ntohs(tcp->th_win)));
+    snprintf(tmp7,sizeof(tmp7),"0x%04x",ntohs(tcp->th_sum));
+    cs.append(tmp7);
+    up.append(QString::number(ntohs(tcp->th_urp)));
+
+    root->appendRow(new QStandardItem(sp));
+    root->appendRow(new QStandardItem(dp));
+    root->appendRow(new QStandardItem(sn));
+    root->appendRow(new QStandardItem(an));
+    root->appendRow(new QStandardItem(hl));
+    root->appendRow(new QStandardItem(flag));
+    root->appendRow(new QStandardItem(ws));
+    root->appendRow(new QStandardItem(cs));
+    root->appendRow(new QStandardItem(up));
+
 }
 void udp_details(const u_char *packet,QStandardItemModel *details){
     QStandardItem *root = new QStandardItem(QString("User Datagram Protocol"));
     details->appendRow(root);
+
+    const struct sniff_udp *udp;
+    udp = (struct sniff_udp *)packet;
+
+    QString sp("Source Port:  "),
+            dp("Destination Port:  "),
+            len("Length:  "),
+            cs("Checksum:  ");
+
+    sp.append(QString::number(ntohs(udp->udp_sp)));
+    dp.append(QString::number(ntohs(udp->udp_dp)));
+    len.append(QString::number(ntohs(udp->udp_l)));
+    char tmp7[7];
+    snprintf(tmp7,sizeof(tmp7),"0x%04x",ntohs(udp->udp_cs));
+    cs.append(tmp7);
+
+    root->appendRow(new QStandardItem(sp));
+    root->appendRow(new QStandardItem(dp));
+    root->appendRow(new QStandardItem(len));
+    root->appendRow(new QStandardItem(cs));
 }
 void icmp_details(const u_char *packet,QStandardItemModel *details){
     QStandardItem *root = new QStandardItem(QString("Internet Control Message Protocol"));
     details->appendRow(root);
+
+    const struct sniff_icmp *icmp;
+    icmp = (struct sniff_icmp *)packet;
+    QString t("Type:  "),
+            c("Code:  "),
+            cs("Checksum:  ");
+
+    t.append(QString::number(icmp->icmp_t));
+    switch(icmp->icmp_t){
+    case ICMP_REPLY:t.append("(Echo (ping) reply)");break;
+    case ICMP_REQUEST:t.append("(Echo (ping) request)");break;
+    }
+    c.append(QString::number(icmp->icmp_c));
+    char tmp7[7];
+    snprintf(tmp7,sizeof(tmp7),"0x%04x",ntohs(icmp->icmp_cs));
+    cs.append(tmp7);
+
+    root->appendRow(new QStandardItem(t));
+    root->appendRow(new QStandardItem(c));
+    root->appendRow(new QStandardItem(cs));
 }
