@@ -60,6 +60,7 @@ void    SnifferThread::run(){
     while((tmp=pcap_next_ex(handle,&packet_header,&packet))>=0&&stop==false){
 
         QList<QStandardItem *>row;
+        row.append(new QStandardItem(QString::number(++packetnum)));
         packet_info(packet_header,packet,&row);
 
         /* insert full size of row */

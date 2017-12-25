@@ -35,6 +35,8 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_btn_clear_clicked();
+
 private:
     Save_Dialog				*save_dialog;
     Ui::MainWindow          *ui;

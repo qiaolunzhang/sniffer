@@ -110,3 +110,26 @@ void MainWindow::on_pushButton_3_clicked()
     save_dialog = new Save_Dialog;
     save_dialog->show();
 }
+
+void MainWindow::on_btn_clear_clicked()
+{
+    snifferthread->stopcapture();
+    snifferthread = NULL;
+    delete snifferthread;
+    snifferthread = NULL;
+    delete packetModel;
+    delete packetModelProxy;
+    packetModel = new QStandardItemModel(0, 7, this);
+    packetModel->setHorizontalHeaderItem(0, new QStandardItem("No"));
+    packetModel->setHorizontalHeaderItem(1, new QStandardItem("Time"));
+    packetModel->setHorizontalHeaderItem(2, new QStandardItem("Source"));
+    packetModel->setHorizontalHeaderItem(3, new QStandardItem("Destination"));
+    packetModel->setHorizontalHeaderItem(4, new QStandardItem("Pro"));
+    packetModel->setHorizontalHeaderItem(5, new QStandardItem("Len"));
+    packetModel->setHorizontalHeaderItem(6, new QStandardItem("Info"));
+
+    packetModelProxy = new QSortFilterProxyModel(this);
+    packetModelProxy->setSourceModel(packetModel);
+
+    ui->packetTableView->setModel(packetModelProxy);
+}

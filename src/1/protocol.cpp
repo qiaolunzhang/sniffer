@@ -7,7 +7,6 @@ void packet_info(const struct pcap_pkthdr *header, const u_char *packet, QList<Q
 
     /* declare pointers to packet headers */
     const struct sniff_ethernet *ethernet;  /* The ethernet header [1] */
-    row->append(new QStandardItem(QString::number(count++)));
     row->append(new QStandardItem(QString(ctime((const time_t *)&header->ts.tv_sec))));
 
     /* define ethernet header */
