@@ -8,6 +8,11 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileSystemModel>
+#include<pcap.h>
+#include<stdio.h>
+#include<stdlib.h> // for exit()
+#include<string.h> //for memset
+
 
 namespace Ui {
 class Save_Dialog;
@@ -22,11 +27,14 @@ public:
     ~Save_Dialog();
 
 private slots:
-    void on_pushButton_clicked();
+    void 					on_pushButton_clicked();
 
 private:
-    Ui::Save_Dialog *ui;
-    QDirModel *model;
+    Ui::Save_Dialog 		*ui;
+    QDirModel 				*model;
+    FILE					*logfile;
 };
+
+
 
 #endif // SAVE_DIALOG_H
