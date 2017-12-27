@@ -37,9 +37,13 @@ private:
     std::vector<ip_vector> ip_vector_queue;
 
     // variable for write the file
-    FILE *logfile;
-    struct sockaddr_in source,dest;
-
+    FILE 				*logfile;
+    struct sockaddr_in 	source,dest;
+    struct icmphdr 		*icmph;
+    struct iphdr 		*iph;
+    struct tcphdr 		*tcph;
+    struct ethhdr 		*eth;
+    struct udphdr 		*udph;
 
     void				ip_frag_reasm();
     void				check_ip_queue(struct ip_vector * ip_vector_check);

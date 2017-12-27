@@ -5,11 +5,13 @@ void SnifferThread::process_packet(const u_char *buffer)
     //int size = header->len;
 
     //Get the IP Header part of this packet , excluding the ethernet header
-    struct iphdr *iph = (struct iphdr*)(buffer + sizeof(struct ethhdr));
-    int size = iph->tot_len;
+    fprintf(logfile, "test\n");
+    iph = (struct iphdr*)(buffer + sizeof(struct ethhdr));
+    int size = ntohs(iph->tot_len) + 14;
     switch (iph->protocol) //Check the Protocol and do accordingly...
     {
         case 1:  //ICMP Protocol
+            //std::cout << "saving icmp" << std::endl;
             print_icmp_packet( buffer , size);
             break;
 
@@ -17,21 +19,24 @@ void SnifferThread::process_packet(const u_char *buffer)
             break;
 
         case 6:  //TCP Protocol
+            //std::cout << "saving tcp" << std::endl;
             print_tcp_packet(buffer , size);
             break;
 
         case 17: //UDP Protocol
+            //std::cout << "saving udp" << std::endl;
             print_udp_packet(buffer , size);
             break;
 
         default: //Some Other Protocol like ARP etc.
+            //std::cout << "other protocol" << std::endl;
             break;
     }
 }
 
 void SnifferThread::print_ethernet_header(const u_char *Buffer, int Size)
 {
-    struct ethhdr *eth = (struct ethhdr *)Buffer;
+    eth = (struct ethhdr *)Buffer;
 
     fprintf(logfile , "\n");
     fprintf(logfile , "Ethernet Header\n");
@@ -46,7 +51,7 @@ void SnifferThread::print_ip_header(const u_char * Buffer, int Size)
 
     unsigned short iphdrlen;
 
-    struct iphdr *iph = (struct iphdr *)(Buffer  + sizeof(struct ethhdr) );
+    iph = (struct iphdr *)(Buffer  + sizeof(struct ethhdr) );
     iphdrlen =iph->ihl*4;
 
     memset(&source, 0, sizeof(source));
@@ -70,16 +75,18 @@ void SnifferThread::print_ip_header(const u_char * Buffer, int Size)
     fprintf(logfile , "   |-Checksum : %d\n",ntohs(iph->check));
     fprintf(logfile , "   |-Source IP        : %s\n" , inet_ntoa(source.sin_addr) );
     fprintf(logfile , "   |-Destination IP   : %s\n" , inet_ntoa(dest.sin_addr) );
+    //fprintf(logfile , "   |-Source IP        : %s\n" , inet_ntoa(iph->saddr) );
+    //fprintf(logfile , "   |-Destination IP   : %s\n" , inet_ntoa(iph->daddr) );
 }
 
 void SnifferThread::print_tcp_packet(const u_char * Buffer, int Size)
 {
     unsigned short iphdrlen;
 
-    struct iphdr *iph = (struct iphdr *)( Buffer  + sizeof(struct ethhdr) );
+    iph = (struct iphdr *)( Buffer  + sizeof(struct ethhdr) );
     iphdrlen = iph->ihl*4;
 
-    struct tcphdr *tcph=(struct tcphdr*)(Buffer + iphdrlen + sizeof(struct ethhdr));
+    tcph=(struct tcphdr*)(Buffer + iphdrlen + sizeof(struct ethhdr));
 
     int header_size =  sizeof(struct ethhdr) + iphdrlen + tcph->doff*4;
 
@@ -126,10 +133,10 @@ void SnifferThread::print_udp_packet(const u_char *Buffer , int Size)
 
     unsigned short iphdrlen;
 
-    struct iphdr *iph = (struct iphdr *)(Buffer +  sizeof(struct ethhdr));
+    iph = (struct iphdr *)(Buffer +  sizeof(struct ethhdr));
     iphdrlen = iph->ihl*4;
 
-    struct udphdr *udph = (struct udphdr*)(Buffer + iphdrlen  + sizeof(struct ethhdr));
+    udph = (struct udphdr*)(Buffer + iphdrlen  + sizeof(struct ethhdr));
 
     int header_size =  sizeof(struct ethhdr) + iphdrlen + sizeof udph;
 
@@ -162,10 +169,12 @@ void SnifferThread::print_icmp_packet(const u_char * Buffer , int Size)
 {
     unsigned short iphdrlen;
 
-    struct iphdr *iph = (struct iphdr *)(Buffer  + sizeof(struct ethhdr));
+    //struct iphdr *iph = (struct iphdr *)(Buffer  + sizeof(struct ethhdr));
+    iph = (struct iphdr *)(Buffer  + sizeof(struct ethhdr));
     iphdrlen = iph->ihl * 4;
 
-    struct icmphdr *icmph = (struct icmphdr *)(Buffer + iphdrlen  + sizeof(struct ethhdr));
+    //struct icmphdr *icmph = (struct icmphdr *)(Buffer + iphdrlen  + sizeof(struct ethhdr));
+    icmph = (struct icmphdr *)(Buffer + iphdrlen  + sizeof(struct ethhdr));
 
     int header_size =  sizeof(struct ethhdr) + iphdrlen + sizeof icmph;
 

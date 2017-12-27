@@ -18,6 +18,7 @@ SnifferThread::~SnifferThread(){
     for(size_t j=0; j<Data_after_reasm.size(); j++) {
         free(Data_after_reasm.at(j));
     }
+    fclose(this->logfile);
     Data.clear();
     Data_after_reasm.clear();
 }
@@ -25,6 +26,7 @@ void    SnifferThread::stopcapture(void){
     stop = true;
 }
 void    SnifferThread::run(){
+    int static num;
     int promiscuous = 0;
     int timeout = 1000;
     int snapshot_len = 66535;
@@ -56,6 +58,14 @@ void    SnifferThread::run(){
     }
 
     /* capture packet */
+    /********************************test*/
+    this->logfile = fopen("origin_data.txt", "w");
+    if(logfile==NULL)
+    {
+        printf("Unable to create file.");
+    }
+    fprintf(this->logfile, "second time");
+
     int tmp;
     while((tmp=pcap_next_ex(handle,&packet_header,&packet))>=0&&stop==false){
 
@@ -77,6 +87,14 @@ void    SnifferThread::run(){
         memcpy(newData, (void*)packet, packet_header->len);
         Data.push_back(newData);
         packetmodel->appendRow(row);
+        /*************************************test*/
+        num = num + 1;
+        if (num < 20) {
+            this->process_packet((const u_char *)(newData));
+        }
+        else if (num == 20){
+            fclose(this->logfile);
+        }
     }
 
     stop = false;

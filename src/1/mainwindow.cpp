@@ -108,8 +108,24 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    save_dialog = new Save_Dialog;
-    save_dialog->show();
+    //save_dialog = new Save_Dialog;
+    //save_dialog->show();
+    QString name = QInputDialog::getText(this, "Name", "Enter a name");
+
+    if(name.isEmpty()) return;
+    std::cout << name.toStdString() << std::endl;
+
+    // data save index
+    std::vector<int> data_save_index;
+    // pass the index to sniffer
+    //QModelIndexList indexes_save = ui->packetTableView->selectionModel()->selection().indexes();
+    QModelIndexList indexes_save_rows = ui->packetTableView->selectionModel()->selectedRows(0);
+    for (int i = 0; i < indexes_save_rows.count(); ++i) {
+        //std::cout << "number of rows is" << indexes_save_rows.count() << std::endl;
+        //std::cout << "the row number is" << indexes_save_rows.at(i).row() << std::endl;
+        data_save_index.push_back(indexes_save_rows.at(i).row());
+    }
+    //snifferthread->SaveOnePacket(save_file_name, data_save_index);
 }
 
 void MainWindow::on_btn_clear_clicked()
