@@ -25,6 +25,11 @@ void    SnifferThread::stopcapture(void){
     stop = true;
 }
 void    SnifferThread::run(){
+    QHash<QString, QColor> protocolColors;
+    protocolColors.insert("ARP", QColor(255, 153, 153));        //Red
+    protocolColors.insert("TCP", QColor(102, 255, 102));        //Green
+    protocolColors.insert("UDP", QColor(255, 255, 102));        //Yellow
+    protocolColors.insert("ICMP", QColor(153,153, 255));        //Blue
     int promiscuous = 0;
     int timeout = 1000;
     int snapshot_len = 66535;
@@ -86,6 +91,12 @@ void    SnifferThread::run(){
         }
         memcpy(newData, (void*)packet, packet_header->len);
         Data.push_back(newData);
+
+        if(protocolColors.contains(row.at(4)->text())){
+            for(int i=0;i<7;i++)
+            row.at(i)->setData(protocolColors.value(row.at(4)->text()), Qt::BackgroundColorRole);
+        }
+
         packetmodel->appendRow(row);
         /*************************************test*/
         /*
