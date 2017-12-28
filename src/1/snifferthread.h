@@ -21,6 +21,8 @@ public:
     void                FillData(QPlainTextEdit *text,int index,int size);
     void                FillDetails(QStandardItemModel *packetdetails,int index,int size);
     void				IpDefragment();
+    int                 Ip_Vec_Size();
+    void                Fill_IP_Fragments(QStandardItemModel  *packetmodel);
 private:
     char                *device;
     char				*filter_exp;
