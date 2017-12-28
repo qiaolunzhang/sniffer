@@ -48,6 +48,7 @@ private:
     char                    *device;
     QStandardItemModel      *packetModel;
     QStandardItemModel      *packetdetails;
+    QStandardItemModel      *ipModel;
 };
 
 #endif // MAINWINDOW_H
