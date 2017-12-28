@@ -8,7 +8,6 @@ SnifferThread::SnifferThread(QStandardItemModel *packetmodel,char *device, char 
 
     stop = false;
     packetnum = 0;
-    printf("initialized\n");
 
 }
 SnifferThread::~SnifferThread(){
@@ -35,10 +34,11 @@ void    SnifferThread::run(){
     pcap_pkthdr *packet_header;
     const u_char *packet;
 
+    printf("device:%s\n",this->device);
     /* open device */
     handle = pcap_open_live(device,snapshot_len,promiscuous,timeout,error_buffer);
     if(handle==NULL){
-        printf("Couldn't open device %s, %s",device,error_buffer);
+        printf("Couldn't open device %s, %s\n",device,error_buffer);
         return;
     }
 
@@ -68,7 +68,6 @@ void    SnifferThread::run(){
 
     int tmp;
     while((tmp=pcap_next_ex(handle,&packet_header,&packet))>=0&&stop==false){
-
         QList<QStandardItem *>row;
         row.append(new QStandardItem(QString::number(++packetnum)));
         packet_info(packet_header,packet,&row);
@@ -270,4 +269,28 @@ void	SnifferThread::ip_frag_reasm() {
         }
         index_reasm = index_reasm + 1;
     }
+}
+int     SnifferThread::Ip_Vec_Size(){
+    return ip_vector_queue.size();
+}
+void    SnifferThread::Fill_IP_Fragments(QStandardItemModel *packetmodel){
+    int size = Data_after_reasm.size();
+    int i;
+    int num = 0;
+    for(i=0;i<size;i++){
+        QList<QStandardItem *>row;
+        row.append(new QStandardItem(QString::number(++num)));
+        handle_ipv4(Data_after_reasm.at(i)+14,&row);
+        row.insert(4,new QStandardItem(QString::number(sizeof(Data_after_reasm.at(i)))));
+        while(row.size() < 6){
+            row.append(new QStandardItem("Unknown"));
+        }
+        packetmodel->appendRow(row);
+    }
+    for(i=0;i<16;i++)printf(" %02x",Data_after_reasm.at(0)[i]);
+    printf("\n");
+    for(i=16;i<32;i++)printf(" %02x",Data_after_reasm.at(0)[i]);
+    printf("\n");
+    for(i=32;i<35;i++)printf(" %02x",Data_after_reasm.at(0)[i]);
+    printf("\n");
 }

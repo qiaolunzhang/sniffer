@@ -17,10 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     packetModel->setHorizontalHeaderItem(5, new QStandardItem("Len"));
     packetModel->setHorizontalHeaderItem(6, new QStandardItem("Info"));
 
-    packetModelProxy = new QSortFilterProxyModel(this);
-    packetModelProxy->setSourceModel(packetModel);
-
-    ui->packetTableView->setModel(packetModelProxy);
+    ui->packetTableView->setModel(packetModel);
 
     ui->packetTableView->setColumnWidth(0,40);
     ui->packetTableView->setColumnWidth(1,180);
@@ -55,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
     model_dev->setStringList(List);
     ui->comboBox->setModel(model_dev);
     snifferthread = NULL;
+
+    ui->btn_rtn->setEnabled(false);
 }
 
 
@@ -74,37 +73,64 @@ void MainWindow::on_btn_run_clicked()
     std::copy(filter_exp_string.begin(), filter_exp_string.end(), filter_exp);
     filter_exp[filter_exp_string.size()] = '\0';
 
-    printf("start\n");
+
     QByteArray q = ui->comboBox->currentText().toLatin1();
     device = q.data();
+
     if(snifferthread==NULL){
         snifferthread = new SnifferThread(packetModel,device, filter_exp);
     }
-    printf("thread ok\n");
     snifferthread->start();
 }
-
-
 
 void MainWindow::on_btn_stop_clicked()
 {
     snifferthread->stopcapture();
+
 }
 
 void MainWindow::on_packetTableView_doubleClicked(const QModelIndex &index)
 {
-    QModelIndex mappedIndex = packetModelProxy->mapToSource(index);
-    int dataindex = packetModel->data(packetModel->index(mappedIndex.row(), 0)).toInt();
-    int size = packetModel->data(packetModel->index(mappedIndex.row(), 5)).toInt();
-    snifferthread->FillData(ui->packetDataview, dataindex-1, size);
-    snifferthread->FillDetails(packetdetails,dataindex-1,size);
+    if(ui->btn_rtn->isEnabled()){
+        printf("ip fragments details\n");
+    }
+    else{
+        int dataindex = packetModel->data(packetModel->index(index.row(), 0)).toInt();
+        int size = packetModel->data(packetModel->index(index.row(), 5)).toInt();
+        snifferthread->FillData(ui->packetDataview, dataindex-1, size);
+        snifferthread->FillDetails(packetdetails,dataindex-1,size);
+    }
 
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-   snifferthread->IpDefragment();
+    snifferthread->IpDefragment();
+
+    QStandardItemModel *ipModel = new QStandardItemModel(0, 6, this);
+    ipModel->setHorizontalHeaderItem(0, new QStandardItem("No"));
+    ipModel->setHorizontalHeaderItem(1, new QStandardItem("Source"));
+    ipModel->setHorizontalHeaderItem(2, new QStandardItem("Destination"));
+    ipModel->setHorizontalHeaderItem(3, new QStandardItem("Pro"));
+    ipModel->setHorizontalHeaderItem(4, new QStandardItem("Len"));
+    ipModel->setHorizontalHeaderItem(5, new QStandardItem("Info"));
+
+    ui->packetTableView->setModel(ipModel);
+    ui->packetDataview->clear();
+    packetdetails->clear();
+
+    int size = snifferthread->Ip_Vec_Size();
+    if(size<1){
+        printf("No ip fragments");
+    }
+    else{
+        snifferthread->Fill_IP_Fragments(ipModel);
+        }
+
+    ui->btn_rtn->setEnabled(true);
+
 }
+
 
 void MainWindow::on_pushButton_3_clicked()
 {
@@ -135,8 +161,7 @@ void MainWindow::on_btn_clear_clicked()
     delete snifferthread;
     snifferthread = NULL;
     delete packetModel;
-    delete packetModelProxy;
-    packetModel = new QStandardItemModel(0, 7, this);
+    packetModel = new QStandardItemModel(0, 6, this);
     packetModel->setHorizontalHeaderItem(0, new QStandardItem("No"));
     packetModel->setHorizontalHeaderItem(1, new QStandardItem("Time"));
     packetModel->setHorizontalHeaderItem(2, new QStandardItem("Source"));
@@ -145,8 +170,11 @@ void MainWindow::on_btn_clear_clicked()
     packetModel->setHorizontalHeaderItem(5, new QStandardItem("Len"));
     packetModel->setHorizontalHeaderItem(6, new QStandardItem("Info"));
 
-    packetModelProxy = new QSortFilterProxyModel(this);
-    packetModelProxy->setSourceModel(packetModel);
+    ui->packetTableView->setModel(packetModel);
+}
 
-    ui->packetTableView->setModel(packetModelProxy);
+void MainWindow::on_btn_rtn_clicked()
+{
+    ui->packetTableView->setModel(packetModel);
+    ui->btn_rtn->setEnabled(false);
 }

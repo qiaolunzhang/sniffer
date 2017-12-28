@@ -37,6 +37,8 @@ private slots:
 
     void on_btn_clear_clicked();
 
+    void on_btn_rtn_clicked();
+
 private:
     Save_Dialog				*save_dialog;
     Ui::MainWindow          *ui;
@@ -45,7 +47,6 @@ private:
     SnifferThread           *snifferthread;
     char                    *device;
     QStandardItemModel      *packetModel;
-    QSortFilterProxyModel   *packetModelProxy;
     QStandardItemModel      *packetdetails;
 };
 
