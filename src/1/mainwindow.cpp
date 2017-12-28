@@ -151,7 +151,7 @@ void MainWindow::on_pushButton_3_clicked()
         //std::cout << "the row number is" << indexes_save_rows.at(i).row() << std::endl;
         data_save_index.push_back(indexes_save_rows.at(i).row());
     }
-    //snifferthread->SaveOnePacket(save_file_name, data_save_index);
+    snifferthread->SaveSelectedPacket(name, data_save_index);
 }
 
 void MainWindow::on_btn_clear_clicked()

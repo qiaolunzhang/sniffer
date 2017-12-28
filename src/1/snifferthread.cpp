@@ -59,12 +59,14 @@ void    SnifferThread::run(){
 
     /* capture packet */
     /********************************test*/
+    /*
     this->logfile = fopen("origin_data.txt", "w");
     if(logfile==NULL)
     {
         printf("Unable to create file.");
     }
     fprintf(this->logfile, "second time");
+    */
 
     int tmp;
     while((tmp=pcap_next_ex(handle,&packet_header,&packet))>=0&&stop==false){
@@ -87,6 +89,7 @@ void    SnifferThread::run(){
         Data.push_back(newData);
         packetmodel->appendRow(row);
         /*************************************test*/
+        /*
         num = num + 1;
         if (num < 20) {
             this->process_packet((const u_char *)(newData));
@@ -94,6 +97,7 @@ void    SnifferThread::run(){
         else if (num == 20){
             fclose(this->logfile);
         }
+        */
     }
 
     stop = false;

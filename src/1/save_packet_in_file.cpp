@@ -1,5 +1,20 @@
 #include "snifferthread.h"
 
+void SnifferThread::SaveSelectedPacket(QString file_name_to_save, struct std::vector<int> packet_index_save) {
+
+    std::vector<int> ::iterator i;
+    std::cout << "now we are saving" << std::endl;
+    for (i = packet_index_save.begin(); i != packet_index_save.end(); i++) {
+        this->logfile = fopen("logfile.txt", "a");
+        if(logfile==NULL)
+        {
+            printf("Unable to create file.");
+        }
+        this->process_packet(Data[*i]);
+        fclose(this->logfile);
+    }
+}
+
 void SnifferThread::process_packet(const u_char *buffer)
 {
     //int size = header->len;

@@ -23,6 +23,7 @@ public:
     void				IpDefragment();
     int                 Ip_Vec_Size();
     void                Fill_IP_Fragments(QStandardItemModel  *packetmodel);
+    void				SaveSelectedPacket(QString file_name_to_save, struct std::vector<int> packet_index_save);
 private:
     char                *device;
     char				*filter_exp;
