@@ -4,8 +4,11 @@ void SnifferThread::SaveSelectedPacket(QString file_name_to_save, struct std::ve
 
     std::vector<int> ::iterator i;
     std::cout << "now we are saving" << std::endl;
+    std::string file_name_to_save_string = file_name_to_save.toStdString();
+    const char * file_name_to_save_p = file_name_to_save_string.c_str();
     for (i = packet_index_save.begin(); i != packet_index_save.end(); i++) {
-        this->logfile = fopen("logfile.txt", "a");
+        //this->logfile = fopen("logfile.txt", "a");
+        this->logfile = fopen(file_name_to_save_p, "a");
         if(logfile==NULL)
         {
             printf("Unable to create file.");
