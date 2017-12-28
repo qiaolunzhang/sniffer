@@ -25,7 +25,6 @@ void    SnifferThread::stopcapture(void){
     stop = true;
 }
 void    SnifferThread::run(){
-    int static num;
     int promiscuous = 0;
     int timeout = 1000;
     int snapshot_len = 66535;
@@ -125,7 +124,7 @@ void    SnifferThread::FillData(QPlainTextEdit *text,int index,int size){
 
     text->appendPlainText(add);
 }
-void    SnifferThread::FillDetails(QStandardItemModel *packetdetails,int index,int size){
+void    SnifferThread::FillDetails(QStandardItemModel *packetdetails,int index){
     packetdetails->clear();
     packet_details(Data.at(index),packetdetails);
 }
@@ -298,13 +297,14 @@ void    SnifferThread::Fill_IP_Fragments(QStandardItemModel *packetmodel){
         QList<QStandardItem *>row;
         row.append(new QStandardItem(QString::number(++num)));
         handle_ipv4(Data_after_reasm.at(i)+14,&row);
-        row.insert(4,new QStandardItem(QString::number(sizeof(Data_after_reasm.at(i)))));
         while(row.size() < 6){
             row.append(new QStandardItem("Unknown"));
         }
-        packetmodel->appendRow(row);
+
         ip = (struct sniff_ipv4*)(Data_after_reasm.at(i)+ SIZE_ETHERNET);
+        row.insert(4,new QStandardItem(QString::number(ntohs(ip->ip_len)+14)));
         std::cout << ntohs(ip->ip_len) << std::endl;
+        packetmodel->appendRow(row);
     }
     for(i=0;i<16;i++)printf(" %02x",Data_after_reasm.at(0)[i]);
     printf("\n");
@@ -312,4 +312,30 @@ void    SnifferThread::Fill_IP_Fragments(QStandardItemModel *packetmodel){
     printf("\n");
     for(i=32;i<35;i++)printf(" %02x",Data_after_reasm.at(0)[i]);
     printf("\n");
+}
+void    SnifferThread::Fill_IP_Details(QStandardItemModel *packetdetails,int index){
+    packetdetails->clear();
+    packet_details(Data_after_reasm.at(index),packetdetails);
+}
+void    SnifferThread::Fill_IP_Data(QPlainTextEdit *text,int index,int size){
+    text->clear();
+    QString add;
+    char d[4],o[9];
+    int i,j;
+    int offset = 0;
+    printf("index:%d & size:%d\n",index,size);
+    for(i=0;i<size;i+=16){
+        snprintf(o,sizeof(o),"%04x    ",offset);
+        add.append(o);
+        j=0;
+        while(j<(((size-i)<16)?(size-i):16)){
+            snprintf(d,sizeof(d),"%02x ",Data_after_reasm.at(index)[offset+j]);
+            add.append(d);
+            j++;
+        }
+        add.append(QString('\n'));
+        offset +=16;
+    }
+
+    text->appendPlainText(add);
 }

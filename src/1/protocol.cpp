@@ -167,7 +167,7 @@ void handle_icmp(const u_char *packet,QList<QStandardItem *> *row){
 }
 
 /* insert packet details into model */
-void packet_details(const u_char *packet,QStandardItemModel *details){
+void packet_details(const u_char *packet, QStandardItemModel *details){
     /* add root to details */
     QStandardItem *root = new QStandardItem(QString("Ethernet II"));
     details->appendRow(root);
@@ -268,17 +268,17 @@ void ipv4_details(const u_char *packet,QStandardItemModel *details){
     switch(ip->ip_p) {
     case IPPROTO_TCP:{
         pro.append(QString("TCP(6)"));
-        tcp_details((packet+size_ip),details);
+        tcp_details((packet+size_ip),details,ntohs(ip->ip_len)-size_ip);
         break;
     }
     case IPPROTO_UDP:{
         pro.append(QString("UDP(17)"));
-        udp_details((packet+size_ip),details);
+        udp_details((packet+size_ip),details,ntohs(ip->ip_len)-size_ip);
         break;
     }
     case IPPROTO_ICMP:{
         pro.append(QString("ICMP(1)"));
-        icmp_details((packet+size_ip),details);
+        icmp_details((packet+size_ip),details,ntohs(ip->ip_len)-size_ip);
         break;
     }
     default:pro.append(QString("UNKNOWN"));
@@ -327,17 +327,17 @@ void ipv6_details(const u_char *packet,QStandardItemModel *details){
     switch(ip->ip6_p) {
     case IPPROTO_TCP:{
         nh.append(QString("TCP(6)"));
-        tcp_details((packet+IPV6_HEADER_LENGTH),details);
+        tcp_details((packet+IPV6_HEADER_LENGTH),details,ntohs(ip->ip6_len));
         break;
     }
     case IPPROTO_UDP:{
         nh.append(QString("UDP(17)"));
-        udp_details((packet+IPV6_HEADER_LENGTH),details);
+        udp_details((packet+IPV6_HEADER_LENGTH),details,ntohs(ip->ip6_len));
         break;
     }
     case IPPROTO_ICMP:{
         nh.append(QString("ICMP(1)"));
-        icmp_details((packet+IPV6_HEADER_LENGTH),details);
+        icmp_details((packet+IPV6_HEADER_LENGTH),details,ntohs(ip->ip6_len));
         break;
     }
     default:nh.append(QString("UNKNOWN"));
@@ -413,7 +413,7 @@ void arp_details(const u_char *packet,QStandardItemModel *details){
     root->appendRow(new QStandardItem(tip));
 
 }
-void tcp_details(const u_char *packet,QStandardItemModel *details){
+void tcp_details(const u_char *packet,QStandardItemModel *details,int size){
     QStandardItem *root = new QStandardItem(QString("Transmission Control Protocol"));
     details->appendRow(root);
 
@@ -465,8 +465,30 @@ void tcp_details(const u_char *packet,QStandardItemModel *details){
     root->appendRow(new QStandardItem(cs));
     root->appendRow(new QStandardItem(up));
 
+    printf("tcp size:%d\n",size);
+    if(size>size_tcp){
+        int len = size-size_tcp;
+        QString dataroot("Data(");
+        QString data;
+        dataroot.append(QString::number(size-size_tcp));
+        dataroot.append(" bytes)");
+        QStandardItem *datarootitem = new QStandardItem(dataroot);
+        details->appendRow(datarootitem);
+        char tmp[2];
+        const u_char *ch=packet+size_tcp;
+        for(int i =0;i<len;i++){
+            if(isprint(*ch)){
+                snprintf(tmp,sizeof(tmp),"%c",*ch);
+                data.append(tmp);
+            }
+            else
+                data.append('.');
+            ch++;
+        }
+        datarootitem->appendRow(new QStandardItem(data));
+    }
 }
-void udp_details(const u_char *packet,QStandardItemModel *details){
+void udp_details(const u_char *packet,QStandardItemModel *details,int size){
     QStandardItem *root = new QStandardItem(QString("User Datagram Protocol"));
     details->appendRow(root);
 
@@ -489,8 +511,30 @@ void udp_details(const u_char *packet,QStandardItemModel *details){
     root->appendRow(new QStandardItem(dp));
     root->appendRow(new QStandardItem(len));
     root->appendRow(new QStandardItem(cs));
+
+    if(size>8){
+        int len = size-8;
+        QString dataroot("Data(");
+        QString data;
+        dataroot.append(QString::number(len));
+        dataroot.append(" bytes)");
+        QStandardItem *datarootitem = new QStandardItem(dataroot);
+        details->appendRow(datarootitem);
+        char tmp[2];
+        const u_char *ch=packet+8;
+        for(int i =0;i<len;i++){
+            if(isprint(*ch)){
+                snprintf(tmp,sizeof(tmp),"%c",*ch);
+                data.append(tmp);
+            }
+            else
+                data.append('.');
+            ch++;
+        }
+        datarootitem->appendRow(new QStandardItem(data));
+    }
 }
-void icmp_details(const u_char *packet,QStandardItemModel *details){
+void icmp_details(const u_char *packet, QStandardItemModel *details, int size){
     QStandardItem *root = new QStandardItem(QString("Internet Control Message Protocol"));
     details->appendRow(root);
 
@@ -513,4 +557,26 @@ void icmp_details(const u_char *packet,QStandardItemModel *details){
     root->appendRow(new QStandardItem(t));
     root->appendRow(new QStandardItem(c));
     root->appendRow(new QStandardItem(cs));
+
+    if(size>8){
+        int len = size-8;
+        QString dataroot("Data(");
+        QString data;
+        dataroot.append(QString::number(len));
+        dataroot.append(" bytes)");
+        QStandardItem *datarootitem = new QStandardItem(dataroot);
+        details->appendRow(datarootitem);
+        char tmp[2];
+        const u_char *ch=packet+8;
+        for(int i =0;i<len;i++){
+            if(isprint(*ch)){
+                snprintf(tmp,sizeof(tmp),"%c",*ch);
+                data.append(tmp);
+            }
+            else
+                data.append('.');
+            ch++;
+        }
+        datarootitem->appendRow(new QStandardItem(data));
+    }
 }

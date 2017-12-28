@@ -93,12 +93,17 @@ void MainWindow::on_packetTableView_doubleClicked(const QModelIndex &index)
 {
     if(ui->btn_rtn->isEnabled()){
         printf("ip fragments details\n");
+        int dataindex = ipModel->data(ipModel->index(index.row(), 0)).toInt();
+        int size = ipModel->data(ipModel->index(index.row(), 4)).toInt();
+        snifferthread->Fill_IP_Data(ui->packetDataview, dataindex-1, size);
+        snifferthread->Fill_IP_Details(packetdetails,dataindex-1);
+
     }
     else{
         int dataindex = packetModel->data(packetModel->index(index.row(), 0)).toInt();
         int size = packetModel->data(packetModel->index(index.row(), 5)).toInt();
         snifferthread->FillData(ui->packetDataview, dataindex-1, size);
-        snifferthread->FillDetails(packetdetails,dataindex-1,size);
+        snifferthread->FillDetails(packetdetails,dataindex-1);
     }
 
 }
@@ -107,7 +112,7 @@ void MainWindow::on_pushButton_clicked()
 {
     snifferthread->IpDefragment();
 
-    QStandardItemModel *ipModel = new QStandardItemModel(0, 6, this);
+    ipModel = new QStandardItemModel(0, 6, this);
     ipModel->setHorizontalHeaderItem(0, new QStandardItem("No"));
     ipModel->setHorizontalHeaderItem(1, new QStandardItem("Source"));
     ipModel->setHorizontalHeaderItem(2, new QStandardItem("Destination"));

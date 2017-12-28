@@ -19,10 +19,12 @@ public:
     ~SnifferThread();
     void                stopcapture();
     void                FillData(QPlainTextEdit *text,int index,int size);
-    void                FillDetails(QStandardItemModel *packetdetails,int index,int size);
+    void                FillDetails(QStandardItemModel *packetdetails,int index);
     void				IpDefragment();
     int                 Ip_Vec_Size();
     void                Fill_IP_Fragments(QStandardItemModel  *packetmodel);
+    void                Fill_IP_Data(QPlainTextEdit *text,int index,int size);
+    void                Fill_IP_Details(QStandardItemModel *packetdetails,int index);
     void				SaveSelectedPacket(QString file_name_to_save, struct std::vector<int> packet_index_save);
 private:
     char                *device;

@@ -147,9 +147,9 @@ void handle_icmp(const u_char *packet,QList<QStandardItem *> *row);
 
 void packet_details(const u_char *packet,QStandardItemModel *details);
 void ipv4_details(const u_char *packet,QStandardItemModel *details);
-void ipv6_details(const u_char *packet,QStandardItemModel *details);
+void ipv6_details(const u_char *packet,QStandardItemModel *detailsa);
 void arp_details(const u_char *packet,QStandardItemModel *details);
-void tcp_details(const u_char *packet,QStandardItemModel *details);
-void udp_details(const u_char *packet,QStandardItemModel *details);
-void icmp_details(const u_char *packet,QStandardItemModel *details);
+void tcp_details(const u_char *packet,QStandardItemModel *details,int size);
+void udp_details(const u_char *packet,QStandardItemModel *details,int size);
+void icmp_details(const u_char *packet,QStandardItemModel *details,int size);
 #endif
