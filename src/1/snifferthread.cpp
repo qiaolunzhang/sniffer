@@ -160,6 +160,7 @@ void	SnifferThread::ip_belong_to_packet(size_t hash, int index_packet) {
     if (ip_vector_queue.empty()) {
         struct ip_vector ip_vector_new;
         ip_vector_new.hash_fragment = hash;
+        ip_vector_new.ip_vector_fragment.push_back(index_packet);
         // need to change
         ip_vector_new.flag = true;
         ip_vector_queue.push_back(ip_vector_new);
