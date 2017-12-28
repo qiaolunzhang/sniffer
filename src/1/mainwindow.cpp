@@ -121,12 +121,20 @@ void MainWindow::on_pushButton_clicked()
     ipModel->setHorizontalHeaderItem(5, new QStandardItem("Info"));
 
     ui->packetTableView->setModel(ipModel);
+
+    ui->packetTableView->setColumnWidth(0,40);
+    ui->packetTableView->setColumnWidth(1,120);
+    ui->packetTableView->setColumnWidth(2,120);
+    ui->packetTableView->setColumnWidth(3,70);
+    ui->packetTableView->setColumnWidth(4,100);
+    ui->packetTableView->setColumnWidth(5,250);
+
     ui->packetDataview->clear();
     packetdetails->clear();
 
     int size = snifferthread->Ip_Vec_Size();
     if(size<1){
-        printf("No ip fragments");
+        printf("No ip fragments\n");
     }
     else{
         snifferthread->Fill_IP_Fragments(ipModel);
@@ -182,4 +190,11 @@ void MainWindow::on_btn_rtn_clicked()
 {
     ui->packetTableView->setModel(packetModel);
     ui->btn_rtn->setEnabled(false);
+    ui->packetTableView->setColumnWidth(0,40);
+    ui->packetTableView->setColumnWidth(1,180);
+    ui->packetTableView->setColumnWidth(2,120);
+    ui->packetTableView->setColumnWidth(3,120);
+    ui->packetTableView->setColumnWidth(4,50);
+    ui->packetTableView->setColumnWidth(5,50);
+    ui->packetTableView->setColumnWidth(6,250);
 }
