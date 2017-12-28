@@ -237,9 +237,11 @@ void 	SnifferThread::craft_packet(int ip_vector_craft) {
     copy_index = SIZE_ETHERNET + 2;
     unsigned short length_total_network = htons(length_total);
     std::cout << "length in header" << length_total << std::endl;
+    std::cout << "length in length_total_network" << ntohs(length_total_network) << std::endl;
     memcpy(newData+copy_index, (void*)(&length_total_network), 2);
+    std::cout << "length after copyed" << ntohs(ip->ip_len) << std::endl;
 
-    copy_index = SIZE_ETHERNET + 3;
+    copy_index = SIZE_ETHERNET + 6;
     unsigned short offset_packet = htons(0x8000);
     memcpy(newData+copy_index, (void*)(&offset_packet), 2);
 
@@ -261,7 +263,8 @@ void 	SnifferThread::craft_packet(int ip_vector_craft) {
     printf("src ip: %s\n", inet_ntoa(ip->ip_src));
     printf("des ip: %s\n", inet_ntoa(ip->ip_dst));
 
-    std::cout << "total length of this packet is " << length_total << std::endl;
+    ip = (struct sniff_ipv4*)(newData + SIZE_ETHERNET);
+    std::cout << "total length of this packet is " << ntohs(ip->ip_len)<< std::endl;
     Data_after_reasm.push_back(newData);
 }
 
@@ -283,6 +286,7 @@ int     SnifferThread::Ip_Vec_Size(){
     return ip_vector_queue.size();
 }
 void    SnifferThread::Fill_IP_Fragments(QStandardItemModel *packetmodel){
+    const struct sniff_ipv4 *ip;
     int size = Data_after_reasm.size();
     int i;
     int num = 0;
@@ -295,6 +299,8 @@ void    SnifferThread::Fill_IP_Fragments(QStandardItemModel *packetmodel){
             row.append(new QStandardItem("Unknown"));
         }
         packetmodel->appendRow(row);
+        ip = (struct sniff_ipv4*)(Data_after_reasm.at(i)+ SIZE_ETHERNET);
+        std::cout << ntohs(ip->ip_len) << std::endl;
     }
     for(i=0;i<16;i++)printf(" %02x",Data_after_reasm.at(0)[i]);
     printf("\n");
