@@ -217,9 +217,10 @@ void 	SnifferThread::craft_packet(int ip_vector_craft) {
         packet_frag = Data[index_packet];
         ip = (struct sniff_ipv4*)(packet_frag + SIZE_ETHERNET);
         printf("src ip: %s\n", inet_ntoa(ip->ip_src));
+        printf("des ip: %s\n", inet_ntoa(ip->ip_dst));
         length_frag = ntohs(ip->ip_len);
         std::cout << "size of this packet is" << length_frag << std::endl;
-        length_total += length_frag - SIZE_ETHERNET;
+        length_total += length_frag - length_ipv4_header;
     }
 
     u_char *newData = (u_char *)malloc(length_total);
@@ -233,11 +234,13 @@ void 	SnifferThread::craft_packet(int ip_vector_craft) {
 
     ip = (struct sniff_ipv4*)(newData + SIZE_ETHERNET);
     // craft header
-    copy_index = SIZE_ETHERNET + 16;
+
+    copy_index = SIZE_ETHERNET + 2;
     unsigned short length_total_network = htons(length_total);
+    std::cout << "length in header" << length_total << std::endl;
     memcpy(newData+copy_index, (void*)(&length_total_network), 2);
 
-    copy_index = SIZE_ETHERNET + 48;
+    copy_index = SIZE_ETHERNET + 3;
     unsigned short offset_packet = htons(0x8000);
     memcpy(newData+copy_index, (void*)(&offset_packet), 2);
 
@@ -246,12 +249,18 @@ void 	SnifferThread::craft_packet(int ip_vector_craft) {
     for (i = ip_vector_now.ip_vector_fragment.begin(); i != ip_vector_now.ip_vector_fragment.end(); ++i) {
         index_packet = *i;
         packet_frag = Data[index_packet];
-        //ip = (struct sniff_ipv4*)(packet_frag + SIZE_ETHERNET);
+        ip = (struct sniff_ipv4*)(packet_frag + SIZE_ETHERNET);
         data_frag = packet_frag + length_header;
+
         length_frag = ntohs(ip->ip_len);
+
         memcpy(newData+copy_index, data_frag, length_frag-length_header);
         copy_index += length_frag - length_header;
     }
+
+    ip = (struct sniff_ipv4*)(newData + SIZE_ETHERNET);
+    printf("src ip: %s\n", inet_ntoa(ip->ip_src));
+    printf("des ip: %s\n", inet_ntoa(ip->ip_dst));
 
     std::cout << "total length of this packet is " << length_total << std::endl;
     Data_after_reasm.push_back(newData);
