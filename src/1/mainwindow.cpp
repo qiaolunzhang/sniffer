@@ -198,3 +198,11 @@ void MainWindow::on_btn_rtn_clicked()
     ui->packetTableView->setColumnWidth(5,50);
     ui->packetTableView->setColumnWidth(6,250);
 }
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    QString text_get = QInputDialog::getText(this, "String", "Enter a string");
+    if(text_get.isEmpty()) return;
+    std::cout << text_get.toStdString() << std::endl;
+    snifferthread->FindTextInPackets(text_get);
+}

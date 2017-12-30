@@ -26,6 +26,7 @@ public:
     void                Fill_IP_Data(QPlainTextEdit *text,int index,int size);
     void                Fill_IP_Details(QStandardItemModel *packetdetails,int index);
     void				SaveSelectedPacket(QString file_name_to_save, struct std::vector<int> packet_index_save);
+    void				FindTextInPackets(QString text_get);
 private:
     char                *device;
     char				*filter_exp;
@@ -39,7 +40,9 @@ private:
     QStandardItemModel  *packetdetails;
     std::vector<unsigned char *> Data;
     std::vector<unsigned char *> Data_after_reasm;
+    std::vector<unsigned char *> Data_Finded;
     std::vector<ip_vector> ip_vector_queue;
+    QString				text_to_find;
 
     // variable for write the file
     FILE 				*logfile;
@@ -66,6 +69,13 @@ private:
     void 				print_udp_packet(const u_char * , int);
     void 				print_icmp_packet(const u_char * , int );
     void 				PrintData (const u_char * , int);
+
+    // find text
+    void				find_packet(const u_char *buffer, int data_number);
+    void				find_tcp_packet(const u_char * Buffer, int Size, int data_number);
+    void				find_udp_packet(const u_char *Buffer , int Size, int data_number);
+    void				find_icmp_packet(const u_char * Buffer , int Size, int data_number);
+    void				FindData (const u_char * data , int Size, int data_number);
 };
 
 #endif // SNIFFERTHREAD_H

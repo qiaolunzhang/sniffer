@@ -33,7 +33,8 @@ SOURCES += \
     protocol.cpp \
     ip_defrag.cpp \
     save_dialog.cpp \
-    save_packet_in_file.cpp
+    save_packet_in_file.cpp \
+    find_in_packets.cpp
 
 HEADERS += \
         mainwindow.h \

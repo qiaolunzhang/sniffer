@@ -39,6 +39,8 @@ private slots:
 
     void on_btn_rtn_clicked();
 
+    void on_pushButton_2_clicked();
+
 private:
     Save_Dialog				*save_dialog;
     Ui::MainWindow          *ui;
