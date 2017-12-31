@@ -32,7 +32,6 @@ SOURCES += \
     snifferthread.cpp \
     protocol.cpp \
     ip_defrag.cpp \
-    save_dialog.cpp \
     save_packet_in_file.cpp \
     find_in_packets.cpp
 
@@ -42,8 +41,6 @@ HEADERS += \
     snifferthread.h \
     protocol.h \
     ip_defrag.h \
-    save_dialog.h
 
 FORMS += \
         mainwindow.ui \
-    save_dialog.ui

@@ -11,7 +11,6 @@
 #include "sniffer.h"
 #include "snifferthread.h"
 #include "protocol.h"
-#include "save_dialog.h"
 
 
 namespace Ui {
@@ -42,7 +41,6 @@ private slots:
     void on_btn_find_clicked();
 
 private:
-    Save_Dialog				*save_dialog;
     Ui::MainWindow          *ui;
     sniffer                 *msniffer;
     QStringListModel        *model_dev;
