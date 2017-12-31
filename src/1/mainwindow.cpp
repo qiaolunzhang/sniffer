@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox->setModel(model_dev);
     snifferthread = NULL;
 
+    state = 1;
     ui->btn_rtn->setEnabled(false);
 }
 
@@ -91,24 +92,34 @@ void MainWindow::on_btn_stop_clicked()
 
 void MainWindow::on_packetTableView_doubleClicked(const QModelIndex &index)
 {
-    if(ui->btn_rtn->isEnabled()){
-        printf("ip fragments details\n");
-        int dataindex = ipModel->data(ipModel->index(index.row(), 0)).toInt();
-        int size = ipModel->data(ipModel->index(index.row(), 4)).toInt();
-        snifferthread->Fill_IP_Data(ui->packetDataview, dataindex-1, size);
-        snifferthread->Fill_IP_Details(packetdetails,dataindex-1);
-
-    }
-    else{
-        int dataindex = packetModel->data(packetModel->index(index.row(), 0)).toInt();
-        int size = packetModel->data(packetModel->index(index.row(), 5)).toInt();
+    int dataindex,size;
+    switch(state){
+    case 1:
+        dataindex = packetModel->data(packetModel->index(index.row(), 0)).toInt();
+        size = packetModel->data(packetModel->index(index.row(), 5)).toInt();
         snifferthread->FillData(ui->packetDataview, dataindex-1, size);
         snifferthread->FillDetails(packetdetails,dataindex-1);
+        break;
+    case 2:
+        printf("ip fragments details\n");
+        dataindex = ipModel->data(ipModel->index(index.row(), 0)).toInt();
+        size = ipModel->data(ipModel->index(index.row(), 4)).toInt();
+        snifferthread->Fill_IP_Data(ui->packetDataview, dataindex-1, size);
+        snifferthread->Fill_IP_Details(packetdetails,dataindex-1);
+        break;
+    case 3:
+        printf("show packets finded details\n");
+        dataindex = findModel->data(findModel->index(index.row(), 0)).toInt();
+        size = findModel->data(findModel->index(index.row(), 4)).toInt();
+        snifferthread->Fill_Find_Data(ui->packetDataview, dataindex-1, size);
+        snifferthread->Fill_Find_Details(packetdetails,dataindex-1);
+        break;
     }
+
 
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_btn_dfg_clicked()
 {
     snifferthread->IpDefragment();
 
@@ -139,13 +150,13 @@ void MainWindow::on_pushButton_clicked()
     else{
         snifferthread->Fill_IP_Fragments(ipModel);
         }
-
+    state = 2;
     ui->btn_rtn->setEnabled(true);
 
 }
 
 
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::on_btn_save_clicked()
 {
     //save_dialog = new Save_Dialog;
     //save_dialog->show();
@@ -197,12 +208,43 @@ void MainWindow::on_btn_rtn_clicked()
     ui->packetTableView->setColumnWidth(4,50);
     ui->packetTableView->setColumnWidth(5,50);
     ui->packetTableView->setColumnWidth(6,250);
+    state = 1;
 }
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_btn_find_clicked()
 {
     QString text_get = QInputDialog::getText(this, "String", "Enter a string");
     if(text_get.isEmpty()) return;
     std::cout << text_get.toStdString() << std::endl;
     snifferthread->FindTextInPackets(text_get);
+
+    findModel = new QStandardItemModel(0, 6, this);
+    findModel->setHorizontalHeaderItem(0, new QStandardItem("No"));
+    findModel->setHorizontalHeaderItem(1, new QStandardItem("Source"));
+    findModel->setHorizontalHeaderItem(2, new QStandardItem("Destination"));
+    findModel->setHorizontalHeaderItem(3, new QStandardItem("Pro"));
+    findModel->setHorizontalHeaderItem(4, new QStandardItem("Len"));
+    findModel->setHorizontalHeaderItem(5, new QStandardItem("Info"));
+
+    ui->packetTableView->setModel(findModel);
+
+    ui->packetTableView->setColumnWidth(0,40);
+    ui->packetTableView->setColumnWidth(1,120);
+    ui->packetTableView->setColumnWidth(2,120);
+    ui->packetTableView->setColumnWidth(3,70);
+    ui->packetTableView->setColumnWidth(4,100);
+    ui->packetTableView->setColumnWidth(5,250);
+
+    ui->packetDataview->clear();
+    packetdetails->clear();
+
+    int size = snifferthread->Find_Vec_Size();
+    if(size<1){
+        printf("Find nothing\n");
+    }
+    else{
+        snifferthread->Fill_Find_Info(findModel);
+        }
+    ui->btn_rtn->setEnabled(true);
+    state = 3;
 }
