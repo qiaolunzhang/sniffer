@@ -9,9 +9,8 @@
 #include <vector>
 #include <QList>
 #include <QPlainTextEdit>
-//#include <netinet/in.h> /* for in_addr */
-//#include <arpa/inet.h> /* for inet_ntoa */
 #include <cmath>
+#include <sstream>
 
 class SnifferThread : public QThread{
 public:

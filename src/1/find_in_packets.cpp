@@ -95,22 +95,14 @@ void SnifferThread::find_icmp_packet(const u_char * Buffer , int Size, int data_
 
 void SnifferThread::FindData (const u_char * data , int Size, int data_number)
 {
-    QString result = "";
+    std::string result = "";
     int lengthOfString = Size;
     // print string in reverse order
-    QString s;
-    for( int i = 0; i < lengthOfString; i++ ){
-        s = QString( "%1" ).arg( data[i], 0, 16 );
+    result.assign((const char*)data, lengthOfString);
 
-        // account for single-digit hex values (always must serialize as two digits)
-        if( s.length() == 1 )
-            result.append( "0" );
 
-        result.append( s );
-    }
-
-    if (this->text_to_find.toStdString().find(result.toStdString())) {
-        //std::cout << result.toStdString() << std::endl;
+    if (result.find(this->text_to_find.toStdString())) {
+        std::cout << result << std::endl;
         this->Data_Finded.push_back(Data[data_number]);
     }
 }
