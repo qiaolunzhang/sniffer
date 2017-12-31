@@ -318,12 +318,14 @@ void    SnifferThread::Fill_IP_Fragments(QStandardItemModel *packetmodel){
         std::cout << ntohs(ip->ip_len) << std::endl;
         packetmodel->appendRow(row);
     }
+    /*
     for(i=0;i<16;i++)printf(" %02x",Data_after_reasm.at(0)[i]);
     printf("\n");
     for(i=16;i<32;i++)printf(" %02x",Data_after_reasm.at(0)[i]);
     printf("\n");
     for(i=32;i<35;i++)printf(" %02x",Data_after_reasm.at(0)[i]);
     printf("\n");
+    */
 }
 void    SnifferThread::Fill_IP_Details(QStandardItemModel *packetdetails,int index){
     packetdetails->clear();
@@ -350,4 +352,61 @@ void    SnifferThread::Fill_IP_Data(QPlainTextEdit *text,int index,int size){
     }
 
     text->appendPlainText(add);
+}
+void    SnifferThread::Fill_Find_Info(QStandardItemModel *packetmodel){
+    const struct sniff_ipv4 *ip;
+    int size = Data_Finded.size();
+    int i;
+    int num = 0;
+    for(i=0;i<size;i++){
+        QList<QStandardItem *>row;
+        row.append(new QStandardItem(QString::number(++num)));
+        handle_ipv4(Data_Finded.at(i)+14,&row);
+        while(row.size() < 6){
+            row.append(new QStandardItem("Unknown"));
+        }
+
+        ip = (struct sniff_ipv4*)(Data_Finded.at(i)+ SIZE_ETHERNET);
+        row.insert(4,new QStandardItem(QString::number(ntohs(ip->ip_len)+14)));
+        std::cout << ntohs(ip->ip_len) << std::endl;
+        packetmodel->appendRow(row);
+    }
+    /*
+    for(i=0;i<16;i++)printf(" %02x",Data_Finded.at(0)[i]);
+    printf("\n");
+    for(i=16;i<32;i++)printf(" %02x",Data_Finded.at(0)[i]);
+    printf("\n");
+    for(i=32;i<35;i++)printf(" %02x",Data_Finded.at(0)[i]);
+    printf("\n");
+    */
+}
+void    SnifferThread::Fill_Find_Details(QStandardItemModel *packetdetails,int index){
+    packetdetails->clear();
+    packet_details(Data_Finded.at(index),packetdetails);
+}
+void    SnifferThread::Fill_Find_Data(QPlainTextEdit *text,int index,int size){
+    text->clear();
+    QString add;
+    char d[4],o[9];
+    int i,j;
+    int offset = 0;
+    printf("index:%d & size:%d\n",index,size);
+    for(i=0;i<size;i+=16){
+        snprintf(o,sizeof(o),"%04x    ",offset);
+        add.append(o);
+        j=0;
+        while(j<(((size-i)<16)?(size-i):16)){
+            snprintf(d,sizeof(d),"%02x ",Data_Finded.at(index)[offset+j]);
+            add.append(d);
+            j++;
+        }
+        add.append(QString('\n'));
+        offset +=16;
+    }
+
+    text->appendPlainText(add);
+}
+int     SnifferThread::Find_Vec_Size(){
+    std::cout<<"Packet finded num:"<<Data_Finded.size()<<'\n';
+    return Data_Finded.size();
 }

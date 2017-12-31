@@ -26,6 +26,11 @@ public:
     void                Fill_IP_Details(QStandardItemModel *packetdetails,int index);
     void				SaveSelectedPacket(QString file_name_to_save, struct std::vector<int> packet_index_save);
     void				FindTextInPackets(QString text_get);
+    int                 Find_Vec_Size();
+    void                Fill_Find_Info(QStandardItemModel *packetmodel);
+    void                Fill_Find_Data(QPlainTextEdit *text,int index,int size);
+    void                Fill_Find_Details(QStandardItemModel *packetdetails,int index);
+
 private:
     char                *device;
     char				*filter_exp;

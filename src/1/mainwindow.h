@@ -31,15 +31,15 @@ private slots:
 
     void on_packetTableView_doubleClicked(const QModelIndex &index);
 
-    void on_pushButton_clicked();
+    void on_btn_dfg_clicked();
 
-    void on_pushButton_3_clicked();
+    void on_btn_save_clicked();
 
     void on_btn_clear_clicked();
 
     void on_btn_rtn_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_btn_find_clicked();
 
 private:
     Save_Dialog				*save_dialog;
@@ -51,6 +51,8 @@ private:
     QStandardItemModel      *packetModel;
     QStandardItemModel      *packetdetails;
     QStandardItemModel      *ipModel;
+    QStandardItemModel      *findModel;
+    int                     state;
 };
 
 #endif // MAINWINDOW_H
