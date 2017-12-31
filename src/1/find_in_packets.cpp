@@ -11,6 +11,7 @@ void SnifferThread::FindTextInPackets(QString text_get) {
     int data_number = 0;
     for (i = this->Data.begin(); i != this->Data.end(); i++) {
         this->find_packet(*i, data_number);
+        data_number = data_number + 1;
     }
 }
 
