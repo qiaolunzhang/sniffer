@@ -76,10 +76,13 @@ void MainWindow::on_btn_run_clicked()
 
 
     QByteArray q = ui->comboBox->currentText().toLatin1();
+    std::cout << q.data() << std::endl;
     device = q.data();
+    std::string device_string(device);
+    std::cout << device_string << "device ins string" << std::endl;
 
     if(snifferthread==NULL){
-        snifferthread = new SnifferThread(packetModel,device, filter_exp);
+        snifferthread = new SnifferThread(packetModel,device_string, filter_exp);
     }
     snifferthread->start();
 }

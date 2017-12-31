@@ -102,7 +102,7 @@ void SnifferThread::FindData (const u_char * data , int Size, int data_number)
 
 
     if (result.find(this->text_to_find.toStdString())) {
-        std::cout << result << std::endl;
+        //std::cout << result << std::endl;
         this->Data_Finded.push_back(Data[data_number]);
     }
 }

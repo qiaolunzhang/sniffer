@@ -23,7 +23,6 @@ void SnifferThread::process_packet(const u_char *buffer)
     //int size = header->len;
 
     //Get the IP Header part of this packet , excluding the ethernet header
-    fprintf(logfile, "test\n");
     iph = (struct iphdr*)(buffer + sizeof(struct ethhdr));
     int size = ntohs(iph->tot_len) + 14;
     switch (iph->protocol) //Check the Protocol and do accordingly...
