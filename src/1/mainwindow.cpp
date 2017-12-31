@@ -82,7 +82,11 @@ void MainWindow::on_btn_run_clicked()
     std::cout << device_string << "device ins string" << std::endl;
 
     if(snifferthread==NULL){
-        snifferthread = new SnifferThread(packetModel,device_string, filter_exp);
+        snifferthread = new SnifferThread(packetModel,device_string, filter_exp_string);
+    }
+    else {
+        std::string filter_exp_string = ui->lineEdit->text().toStdString();
+        snifferthread->Set_Filter_Exp(filter_exp_string);
     }
     snifferthread->start();
 }

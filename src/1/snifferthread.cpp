@@ -1,11 +1,11 @@
 #include "snifferthread.h"
 
 
-SnifferThread::SnifferThread(QStandardItemModel *packetmodel,std::string device_string, char *filter_exp_entered = NULL){
+SnifferThread::SnifferThread(QStandardItemModel *packetmodel, std::string device_string, std::string filter_exp_entered = NULL){
     this->packetmodel = packetmodel;
     this->device = device_string;
     //this->device = device;
-    this->filter_exp = filter_exp_entered;
+    this->filter_exp_string = filter_exp_entered;
 
     stop = false;
     packetnum = 0;
@@ -56,11 +56,11 @@ void    SnifferThread::run(){
     }
 
     /* setup filter */
-    if (pcap_compile(handle, &this->fp, filter_exp, 0, net)==-1) {
-        fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
+    if (pcap_compile(handle, &this->fp, (char *)filter_exp_string.c_str(), 0, net)==-1) {
+        fprintf(stderr, "Couldn't parse filter %s: %s\n", (char *)filter_exp_string.c_str(), pcap_geterr(handle));
     }
     if (pcap_setfilter(handle, &this->fp) == -1) {
-        fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
+        fprintf(stderr, "Couldn't install filter %s: %s\n", (char *)filter_exp_string.c_str(), pcap_geterr(handle));
     }
 
     /* capture packet */
@@ -411,4 +411,8 @@ void    SnifferThread::Fill_Find_Data(QPlainTextEdit *text,int index,int size){
 int     SnifferThread::Find_Vec_Size(){
     std::cout<<"Packet finded num:"<<Data_Finded.size()<<'\n';
     return Data_Finded.size();
+}
+
+void 	SnifferThread::Set_Filter_Exp(std::string filter_exp_entered) {
+    this->filter_exp_string = filter_exp_entered;
 }

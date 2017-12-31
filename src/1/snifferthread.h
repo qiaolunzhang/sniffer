@@ -14,7 +14,7 @@
 
 class SnifferThread : public QThread{
 public:
-    SnifferThread(QStandardItemModel *packetmodel,std::string device_string, char *filter_exp_entered);
+    SnifferThread(QStandardItemModel *packetmodel,std::string device_string, std::string filter_exp_entered);
     ~SnifferThread();
     void                stopcapture();
     void                FillData(QPlainTextEdit *text,int index,int size);
@@ -30,10 +30,12 @@ public:
     void                Fill_Find_Info(QStandardItemModel *packetmodel);
     void                Fill_Find_Data(QPlainTextEdit *text,int index,int size);
     void                Fill_Find_Details(QStandardItemModel *packetdetails,int index);
+    void				Set_Filter_Exp(std::string filter_exp_entered);
 
 private:
     std::string 		device;
     char				*filter_exp;
+    std::string			filter_exp_string;
     bool                stop;
     void                run();
     int                 packetnum;
