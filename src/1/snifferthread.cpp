@@ -311,7 +311,7 @@ void    SnifferThread::Fill_IP_Fragments(QStandardItemModel *packetmodel){
         QList<QStandardItem *>row;
         row.append(new QStandardItem(QString::number(++num)));
         handle_ipv4(Data_after_reasm.at(i)+14,&row);
-        while(row.size() < 6){
+        while(row.size() < 5){
             row.append(new QStandardItem("Unknown"));
         }
 
@@ -364,7 +364,7 @@ void    SnifferThread::Fill_Find_Info(QStandardItemModel *packetmodel){
         QList<QStandardItem *>row;
         row.append(new QStandardItem(QString::number(++num)));
         handle_ipv4(Data_Finded.at(i)+14,&row);
-        while(row.size() < 6){
+        while(row.size() < 5){
             row.append(new QStandardItem("Unknown"));
         }
 
